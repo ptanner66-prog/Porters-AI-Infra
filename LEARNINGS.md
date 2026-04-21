@@ -81,6 +81,24 @@ _Add project-specific lessons below as you discover them. Use the format: proble
 
 ---
 
+## 7. Silent Data Truncation at Stage Boundaries
+
+**What happened:** A JSON repair / parser library silently truncated oversized output from an upstream stage before the downstream stage consumed it. No error was thrown. No warning logged. The downstream stage received partial data, accepted it as valid, and proceeded to produce incomplete results. The truncation was only discovered weeks later when output quality metrics diverged from expectations.
+
+**The fix:** Every cross-stage handoff that uses serialization, repair, or transformation must (a) log when a size limit is reached, (b) fail loud rather than pass partial data downstream, and (c) include a length/completeness check on the receiving side that rejects obviously-truncated payloads.
+
+**The lesson:** Silent data loss is the worst kind of bug — it produces plausible-looking output that is quietly wrong. Any step that can truncate, repair, coerce, or re-serialize data across a boundary is a ticking time bomb unless you explicitly verify completeness. Apply the `/lossy` skill before trusting any cross-boundary transformation.
+
+**Detection heuristics:**
+- Look for every `JSON.parse`, `jsonrepair`, or equivalent call — what happens if the input exceeds its limit?
+- Look for every `slice`, `substring`, `.slice(0, N)`, or `LIMIT N` on data that crosses a boundary — what signals truncation to the consumer?
+- Look for every schema/type assertion that narrows a nullable-rich input to a required-field output — what happens when the input lacks the fields?
+- Look for every `try { parse } catch { return default }` — does the default logging include the fact that parsing failed?
+
+**Prevention:** Explicit completeness assertions at boundaries. A sentinel/marker pattern (`{ complete: true, payload: ... }`) on producer side that consumer can verify. And a test case for the "oversized input" path on every transformation step.
+
+---
+
 ## Meta-Lesson: Schema Before Code
 
 Database migrations must deploy before code changes. The deployment sequence is non-negotiable: **schema → code → verify**. If your code change depends on a new column, table, or constraint, the migration must land first. The operator owns migration deployment.
