@@ -48,4 +48,4 @@ Extracted from a production Next.js legal-tech codebase and genericized for doma
 
 ## License
 
-Add one before distribution.
+ALL RIGHTS RESERVED
