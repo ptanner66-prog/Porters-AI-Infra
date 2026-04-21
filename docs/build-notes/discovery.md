@@ -1,3 +1,11 @@
+> **Working document from repo construction. Not part of the tanner-stack methodology. Preserved for transparency on how v0.1 was built.**
+>
+> This report was produced during MODE 1 (DISCOVER) of the Architect persona workflow that built tanner-stack v0.1. It inventories the source repositories that tanner-stack was distilled from and documents which files were extracted, genericized, or skipped. It is relevant only to the construction story of v0.1 — not to tanner-stack's ongoing use. Downstream adopters can safely ignore this file.
+>
+> Moved from repo root to `docs/build-notes/` in the MODE 3 fix pass.
+
+---
+
 # Discovery Report
 
 **Produced:** 2026-04-21 (MODE 1 / DISCOVER)

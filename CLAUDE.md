@@ -32,6 +32,8 @@ Then skim [docs/architecture.md](docs/architecture.md) to understand current int
 
 Then read [docs/extending.md](docs/extending.md) before authoring any new persona, skill, command, or rule — it specifies the templates and quality bar.
 
+Then read [AGENTS.md](AGENTS.md) for session-level governance: mode selection (IMPLEMENT / AUDIT / DISCOVERY), parallel-agent rules, model routing, and the GitNexus inviolable mandate. This is the governance layer that sits above the personas — a persona operates *within* one of the session modes defined there.
+
 If you skip this, you will rediscover pitfalls the stack already encodes.
 
 ---
