@@ -1,0 +1,51 @@
+# tanner-stack
+
+A generic, reusable coding-methodology repository. Distilled from a production coding system and designed to be dropped into any project that will be driven by Claude Code.
+
+## What this is
+
+tanner-stack is a self-teaching starter kit for AI-assisted software engineering. It ships four things:
+
+- **Personas** — named operating identities (Architect, Chen, Code Reviewer, Grep Verifier) with declared modes and staged approval gates.
+- **Skills** — composable capabilities invoked by name (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) that focus a session on a single discipline.
+- **Workflows** — reusable processes for audit → fix → build loops, PR review, commit conventions, and incident response.
+- **Infrastructure** — harness configuration (`.claude/`), rule scaffolds, and hook points for parallel-agent coordination.
+
+The repository is designed to be read **cold** by a future Claude Code session with no prior context. Everything an agent needs to bootstrap is in `CLAUDE.md` and `docs/methodology.md`.
+
+## Who this is for
+
+- Consultants installing an AI agent stack for a client's engineering org.
+- Teams adopting Claude Code who want a strong default configuration before customizing.
+- Solo operators starting a new project and wanting a proven scaffold.
+
+## Quick start
+
+1. Copy this repository into the root of your target project (or clone it and vendor what you need).
+2. Open the project in Claude Code.
+3. The agent reads `CLAUDE.md` and `docs/methodology.md` first. Both are self-contained.
+4. Customize the domain-specific slots noted in the files (operator name, dead-code paths, inviolable rules, etc.).
+
+## Repo map
+
+```
+tanner-stack/
+├── CLAUDE.md                 — entry point; teaches a future session how to use this stack
+├── docs/
+│   ├── methodology.md        — how the system works, in plain English
+│   ├── architecture.md       — integration surfaces and hook points
+│   └── extending.md          — how to add new personas, skills, and workflows
+├── personas/                 — operating identities with mode declarations
+├── skills/                   — single-purpose capabilities
+├── prompts/                  — superprompts and reusable templates
+├── workflows/                — audit-fix-build loop, PR review, commit conventions
+└── .claude/                  — harness config (settings, commands, rules)
+```
+
+## Provenance
+
+Extracted from a production Next.js legal-tech codebase and genericized for domain-agnostic reuse. Every file under `personas/`, `skills/`, `workflows/`, `docs/`, and `prompts/` carries a provenance header.
+
+## License
+
+Add one before distribution.
