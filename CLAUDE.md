@@ -1,180 +1,166 @@
-# CLAUDE.md
+# CLAUDE.md — tanner-stack Orientation
 
-<!-- provenance: genericized from Motion-Granted-Production/CLAUDE.md -->
+<!-- provenance: written fresh for tanner-stack as the self-teaching entry point -->
+<!-- Audience: a future Claude Code session with NO prior context about this repo -->
 
-## Active Branch
+You are reading the root orientation document of **tanner-stack** — a generic, reusable coding-methodology repository. This file is your entry point. Read it end-to-end before taking any action. Every section below is binding.
 
-Run `git branch --show-current` before any file edits.
-Never commit to `main`, `master`, or any branch marked as production/live.
-The operator owns production merges.
+---
 
-## Inviolable Rules
+## 1. What This Stack Is
 
-_Replace these placeholders with your project's non-negotiable constraints. Each rule should be specific, greppable, and testable._
+tanner-stack is a drop-in starter kit for AI-assisted software engineering. It is not an application. It ships four things and nothing else:
 
-1. **[Rule 1 — Cardinal Sin]**: [What must never happen from an error/catch path.]
-2. **[Rule 2]**: [Missing required field = FAIL LOUD. No silent defaults.]
-3. **[Rule 3]**: [What must never appear in customer-facing output.]
-4. **[Rule 4]**: [Config values must come from a single source of truth — never hardcoded.]
-5. **[Rule 5]**: [Schema before code. Migrations deploy before code changes. Always.]
+| Asset | Where | What it is |
+|---|---|---|
+| **Personas** | `personas/` | Named operating identities (Architect, Chen, Code Reviewer, Grep Verifier) with declared modes and staged approval gates. |
+| **Skills** | `skills/` | Single-purpose capabilities invoked by name (`/chen`, `/100`, `/adverse`, `/swarm`, etc.). |
+| **Workflows** | `workflows/` | Reusable processes (audit → fix → build loop, PR review, commit conventions, audit-report template). |
+| **Harness config** | `.claude/` | Settings, command shortcuts, rule scaffolds, launch config. |
 
-_See `.claude/rules/` for domain-specific rules._
+**Use it when:** you are installing an AI agent stack for a client's engineering org, starting a new project, or standardizing AI coding discipline across a team.
 
-## Session Defaults
+**Do not use it as:** a drop-in application, a code-generation library, or something that "does work for you." It is a methodology, not a machine.
 
-- Default effort: high. Escalate to max for architecture decisions and hard debugging.
-- Before every edit: confirm you're on the right branch.
-- After every claim: grep the actual code.
+---
 
-## Project
+## 2. Read the Methodology First
 
-_Fill in your project's essentials. Keep this short — it's the first thing an agent reads._
+Before you do anything else in this repo, read [docs/methodology.md](docs/methodology.md) end-to-end. It explains the four disciplines this stack enforces (evidence labeling, live-path verification, pattern census, bidirectional tracing) and how the persona / skill / command / rule layers compose.
 
-- **What it is**: [One line describing the product]
-- **Stack**: [Key technologies]
-- **Deploy**: [How and where]
-- **Key config**: [Source-of-truth config files — models, registry, tier config, etc.]
+Then skim [docs/architecture.md](docs/architecture.md) to understand current integration surfaces and future hook points (Swarm, Hermes, Mythos, Arsenal).
 
-## Commands
+Then read [docs/extending.md](docs/extending.md) before authoring any new persona, skill, command, or rule — it specifies the templates and quality bar.
 
-_Fill in your project's common commands._
+If you skip this, you will rediscover pitfalls the stack already encodes.
 
-```bash
-# Dev server
-# Build
-# Type check (run after every edit)
-# Test suite
-```
+---
 
-## DO NOT Edit — Dead Code
+## 3. Personas — How to Pick One
 
-_Paths that are dead code, superseded, or read-only. Claude Code must never edit these._
+Personas live in `personas/`. Each declares its mode at the start of every response and halts between modes for operator approval.
 
-- `{path/to/dead/file}` — DEAD. Live equivalent: `{path/to/live/file}`
-- `{path/to/production-live-repo/}` — READ ONLY. Never the edit target.
+| Persona | File | When to invoke |
+|---|---|---|
+| **Architect** | [personas/architect.md](personas/architect.md) | Extracting reusable methodology from a production codebase (DISCOVER → EXTRACT → VERIFY). Also for systems work that needs staged approvals. |
+| **Chen** | [personas/chen.md](personas/chen.md) | Adversarial systems audit — hostile, evidence-driven. Deep subsystem audits, finding expansion, spec-to-code deltas, pre-launch failure audits. Defers to [prompts/superprompts/chen-audit-protocol.md](prompts/superprompts/chen-audit-protocol.md). |
+| **Code Reviewer** | [personas/code-reviewer.md](personas/code-reviewer.md) | Post-diff review. Combines structural evidence (GitNexus) with text evidence (grep). Applies the project's inviolable-rule list. |
+| **Grep Verifier** | [personas/grep-verifier.md](personas/grep-verifier.md) | Skeptical claim validator. Rates every claim CONFIRMED / LIKELY / FALSE POSITIVE with grep evidence. |
 
-## Patterns
+Invocation pattern: read the persona file end-to-end, adopt its identity, declare its mode, and follow its halt rules. Never mix modes in a single response.
 
-- Before editing any file, grep-verify it's on the live execution path: `grep -r "import.*from.*{filename}" {source_dir}/`
-- Use the project logger — not `console.log`
-- All DB writes must be idempotent
-- Do not browse large directories whole — use grep/glob
-- Do not create framework config files that conflict with existing ones (e.g., Tailwind v4 uses CSS config, not `tailwind.config.js`)
+---
 
-## Line Endings
+## 4. Skills — Check Before Writing Code
 
-If your Edit tool appears to silently fail with no error, check line endings: `file <filename>`. CRLF line terminators cause silent no-ops in Claude Code's Edit tool. Fix with `dos2unix <filename>`. Set `git config --global core.autocrlf input` permanently.
+**Always check `skills/` before writing a new script, query, prompt, or procedure.** There is a good chance the discipline you need already exists as a named skill.
 
-## Verification
+Invocation is by name: `/chen <target>`, `/100`, `/swarm <task>`, etc.
 
-After every edit: run your type checker or build. After every claim: grep the actual code.
+Index by category:
 
-Historical false positive rate in AI audits: **38–54%**. Grep before you trust any finding.
+- **Rigor modes** (stay active for the session): `/100`, `/zero`, `/soft`, `/shutup`
+- **Adversarial audit**: `/chen`, `/adverse`, `/code`, `/lossy`, `/st`
+- **Verification / diagnosis**: `/grep-verify` (alias `/gv`), `/diagnose`, `/decide`
+- **Session lifecycle**: `/session-start` (alias `/start`), `/session-end` (alias `/end`), `/pr`
+- **Utilities**: `/sql`, `/swarm`
+- **GitNexus integration**: `/gitnexus-cli`, `/gitnexus-debugging`, `/gitnexus-exploring`, `/gitnexus-guide`
 
-## Compaction
+Full catalog under `skills/`. New skills go through [docs/extending.md](docs/extending.md) and the [skills/_template/SKILL.md](skills/_template/SKILL.md) scaffold.
 
-When compacting, ALWAYS preserve:
-- Current branch name and git status
-- All modified files this session
-- The active task or constraint being implemented
-- Current error/stack trace being debugged
-- Any grep evidence collected
+---
 
-## Out-of-Scope Issues
+## 5. Audit → Fix → Build Loop
 
-When you discover a bug, tech debt, cleanup opportunity, or improvement **outside the current task's scope**, add it to @BACKLOG.md instead of fixing it:
+This is the default workflow for any non-trivial change. Full description in [workflows/audit-fix-build.md](workflows/audit-fix-build.md). Summary:
 
-```
-- [ ] **Title** — One-line description.
-  _Found: YYYY-MM-DD | Context: what you were doing_
-```
+1. **Audit** — invoke `/chen <subsystem>` or a Code Reviewer pass. Produce a findings report with evidence labels and severity. **Do not fix anything in this phase.**
+2. **Fix** — only after audit findings are reviewed and approved. Fix one finding at a time. Run `/grep-verify` on the key claims. Run the project typecheck after every edit.
+3. **Build** — integrate the fixes. Run the full test suite. Run `/adverse` for a completeness check. Open a PR via `/pr` — which delegates back to the Code Reviewer for a final safety pass before submission.
 
-Do NOT expand scope. Do NOT fix it inline. Log it and move on.
+**Rules:**
+- Never skip the audit phase. "I already know the problem" is how false-positive-rate climbs.
+- Never batch multiple findings into a single fix commit unless they are a grouped change set (same file, same function, same contract).
+- Never merge a PR whose audit pass was skipped or waived.
 
-## References
+PR discipline: [workflows/pr-review.md](workflows/pr-review.md). Commit messages: [workflows/commit-conventions.md](workflows/commit-conventions.md). Audit-report format: [workflows/audit-report-template.md](workflows/audit-report-template.md).
 
-See @PROGRESS.md for current implementation status.
-See @LEARNINGS.md for known pitfalls and hard-won lessons.
-See @BACKLOG.md for out-of-scope issues found during sessions.
-See `.claude/rules/` for domain-specific rules.
+---
 
-<!-- gitnexus:start -->
-# GitNexus — Code Intelligence
+## 6. Extending the Stack
 
-_Replace `YOUR_REPO_NAME` everywhere below with your GitNexus index name (the name you passed to `npx gitnexus analyze`)._
+When you need something the stack doesn't already provide, **add it through the extending workflow, not ad-hoc**:
 
-This project is indexed by GitNexus as **YOUR_REPO_NAME**. Use the GitNexus MCP tools to understand code, assess impact, and navigate safely before editing.
+- **New persona** → copy a `personas/` file as a starting point, follow [docs/extending.md § Adding a Persona](docs/extending.md).
+- **New skill** → `cp -r skills/_template skills/<name>`, fill in the slots, follow [docs/extending.md § Adding a Skill](docs/extending.md).
+- **New command** → add a short `.md` under `.claude/commands/`; if it overlaps with a skill, the command is a thin wrapper that delegates.
+- **New rule** → add a `.md` under `.claude/rules/`, following the pattern in [example-rule.md](.claude/rules/example-rule.md) (path-scoped DO NOT list, architecture notes, thresholds, key files).
+- **New workflow** → add a `.md` under `workflows/`, modeled on the existing three.
 
-> If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
+Every new file under `personas/`, `skills/`, `workflows/`, `prompts/`, and `docs/` must carry a provenance header (see [docs/extending.md § Provenance Headers](docs/extending.md)).
 
-## Always Do
+---
 
-- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `gitnexus_impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the operator.
-- **MUST run `gitnexus_detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows.
-- **MUST warn the operator** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `gitnexus_query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
-- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `gitnexus_context({name: "symbolName"})`.
+## 7. Swarm Mode — Parallel-Agent Activation
 
-## When Debugging
+**What it is:** a coordination discipline for deploying multiple agents in parallel on independent subtasks, then synthesizing their outputs.
 
-1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
-2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/YOUR_REPO_NAME/process/{processName}` — trace the full execution flow step by step
-4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
+**How to activate it:** invoke `/swarm <task description and target areas>`. Full protocol: [skills/swarm/SKILL.md](skills/swarm/SKILL.md). Command wrapper: [.claude/commands/swarm.md](.claude/commands/swarm.md).
 
-## When Refactoring
+**Rules:**
+- Decompose by file boundary — no two agents edit the same file.
+- Max 5 subagents per swarm (context budget).
+- Read-only subagents: they investigate and report; the main thread synthesizes and edits.
+- Synthesis step is mandatory.
 
-- **Renaming**: MUST use `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` first. Review the preview — graph edits are safe, text_search edits need manual review. Then run with `dry_run: false`.
-- **Extracting/Splitting**: MUST run `gitnexus_context({name: "target"})` to see all incoming/outgoing refs, then `gitnexus_impact({target: "target", direction: "upstream"})` to find all external callers before moving code.
-- After any refactor: run `gitnexus_detect_changes({scope: "all"})` to verify only expected files changed.
+**Future integration hooks** (not yet implemented, documented for planning — see [docs/architecture.md § Future Hook Points](docs/architecture.md)):
 
-## Never Do
+- **Hermes** — notification / routing agent. Reserved subsection in architecture.md.
+- **Mythos** — long-term memory layer. Reserved subsection in architecture.md.
+- **Arsenal** — tool registry. Reserved subsection in architecture.md.
 
-- NEVER edit a function, class, or method without first running `gitnexus_impact` on it.
-- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
-- NEVER rename symbols with find-and-replace — use `gitnexus_rename` which understands the call graph.
-- NEVER commit changes without running `gitnexus_detect_changes()` to check affected scope.
+Do not invent architecture for Hermes / Mythos / Arsenal. If a task requires them, halt and ask the operator.
 
-## Tools Quick Reference
+---
 
-| Tool | When to use | Command |
-|------|-------------|---------|
-| `query` | Find code by concept | `gitnexus_query({query: "auth validation"})` |
-| `context` | 360-degree view of one symbol | `gitnexus_context({name: "functionName"})` |
-| `impact` | Blast radius before editing | `gitnexus_impact({target: "X", direction: "upstream"})` |
-| `detect_changes` | Pre-commit scope check | `gitnexus_detect_changes({scope: "staged"})` |
-| `rename` | Safe multi-file rename | `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` |
-| `cypher` | Custom graph queries | `gitnexus_cypher({query: "MATCH ..."})` |
+## 8. Common LLM Coding Pitfalls
 
-## Impact Risk Levels
+These are the four failure modes LLM-assisted coding systems repeatedly hit. tanner-stack's personas, skills, and rigor modes exist largely to counter them. Internalize these before touching any code.
 
-| Depth | Meaning | Action |
-|-------|---------|--------|
-| d=1 | WILL BREAK — direct callers/importers | MUST update these |
-| d=2 | LIKELY AFFECTED — indirect deps | Should test |
-| d=3 | MAY NEED TESTING — transitive | Test if critical path |
+### 8.1. Think Before Coding
+State your assumptions explicitly. If uncertain, ask. Do not proceed with hidden confusion or unexamined tradeoffs. Silent assumption → downstream bug you'll spend 10× longer debugging.
 
-## Resources
+> Enforced by: `/100`, `/soft`, `/zero`, every persona's mode-declaration rule.
 
-| Resource | Use for |
-|----------|---------|
-| `gitnexus://repo/YOUR_REPO_NAME/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/YOUR_REPO_NAME/clusters` | All functional areas |
-| `gitnexus://repo/YOUR_REPO_NAME/processes` | All execution flows |
-| `gitnexus://repo/YOUR_REPO_NAME/process/{name}` | Step-by-step execution trace |
+### 8.2. Simplicity First
+Write minimal code that solves the stated problem. No speculative features. No abstractions for single-use code. If your solution exceeds the obvious length, simplify ruthlessly — most "comprehensive" code is padding.
 
-## Self-Check Before Finishing
+> Enforced by: Chen's "no rewrites when precise fixes are available" directive, Code Reviewer's scope-drift check.
 
-Before completing any code modification task, verify:
-1. `gitnexus_impact` was run for all modified symbols
-2. No HIGH/CRITICAL risk warnings were ignored
-3. `gitnexus_detect_changes()` confirms changes match expected scope
-4. All d=1 (WILL BREAK) dependents were updated
+### 8.3. Surgical Changes
+When modifying existing code, touch only what you must. Match surrounding style. Do not "improve" unrelated areas. Remove only the dead code your changes actually created — do not refactor as a side effect.
 
-## CLI
+> Enforced by: `/adverse` integration-wiring check, Code Reviewer's blast-radius analysis.
 
-- Re-index: `npx gitnexus analyze`
-- Check freshness: `npx gitnexus status`
-- Generate docs: `npx gitnexus wiki`
+### 8.4. Goal-Driven Execution
+Transform the operator's request into verifiable success criteria before implementing. Pair each step of your plan with a concrete check (grep, SQL query, test). A task is not complete because code compiled — it's complete when the intended behavior is provably restored.
 
-<!-- gitnexus:end -->
+> Enforced by: `/diagnose` Phase 3 (FIX PROPOSAL), `/verify` three-leg loop, Chen's EXECUTION PROOF RULE.
+
+_Synthesized from: [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) — Andrej Karpathy's distilled observations on LLM coding pitfalls. Credit to Karpathy and Forrest Chang for the original framing._
+
+---
+
+## 9. What This File Is NOT
+
+- **Not a project CLAUDE.md.** When you adopt tanner-stack for a specific project, copy [docs/project-claude-md-template.md](docs/project-claude-md-template.md) to the project root as `CLAUDE.md` and fill in its slots (dead-code paths, inviolable rules, commands, danger zones). That template is the project-level file. **This file** (the one you're reading) stays in tanner-stack itself as the orientation for anyone working inside the stack.
+- **Not an application.** There is no build, no runtime, no server. Just markdown and configuration.
+- **Not exhaustive.** Anything not covered here lives in the docs/ directory or in the files each section links to. Follow the links.
+
+---
+
+## 10. Handoff to the Next Session
+
+Before ending any session in this repo, run `/session-end` or `/end` to produce a structured handoff. Before starting, run `/session-start` or `/start` for a briefing. The lifecycle skills exist for a reason — use them.
+
+When in doubt: halt and ask the operator. The stack rewards paranoia.
