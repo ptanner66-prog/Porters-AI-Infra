@@ -88,3 +88,32 @@ The operator's baseline categorization listed `max` as a main-session skill, but
 2. Step 9: sharpen the 12 Category B descriptions marked `YES`.
 3. Step 10: apply Category C alias notes + delete alias directories; delete `skills/sql/`.
 4. Step 12: move this file to `docs/build-notes/skill-audit-2026-04-21.md` per expanded spec.
+
+---
+
+## Actions taken (post-execution record)
+
+**Commits by step:**
+
+| Step | Commit | Summary |
+|---|---|---|
+| Step 3–6 patch | `ed18f07` | Added `skills:` preloads to all 4 sub-agents; added Swarm Orchestration section (architect) and Focus Modes section (chen); added `memory: project` to each. |
+| Step 9 | `1ec7705` | Sharpened 12 Category B skill descriptions with "Use PROACTIVELY" / "Use when" auto-invocation language. |
+| Step 10 | `d8630c6` | Added alias notes to grep-verify, session-start, session-end bodies. Deleted `skills/gv/`, `skills/start/`, `skills/end/`, `skills/sql/`. |
+
+**Final `skills/` inventory: 25 directories**
+
+- Category A (sub-agent-owned, 8): `chen`, `audit-deep-subsystem`, `audit-finding-expansion`, `audit-spec-to-code-delta`, `audit-pre-launch-failure`, `pr`, `grep-verify`, `swarm`
+- Category B (main-session auto-invoke, 16): `100`, `adverse`, `code`, `decide`, `diagnose`, `gitnexus-cli`, `gitnexus-debugging`, `gitnexus-exploring`, `gitnexus-guide`, `lossy`, `session-end`, `session-start`, `shutup`, `soft`, `st`, `zero`
+- Scaffold (1): `_template`
+
+**Sub-agent skills: frontmatter bindings (verified):**
+
+- architect → `swarm`
+- chen → `chen`, `audit-deep-subsystem`, `audit-finding-expansion`, `audit-spec-to-code-delta`, `audit-pre-launch-failure`
+- code-reviewer → `pr`
+- grep-verifier → `grep-verify`
+
+Every preloaded skill name resolves to a real `skills/<name>/SKILL.md` directory — no orphans, no placeholders.
+
+**Coverage guarantee:** every directory in the final `skills/` inventory is either (a) preloaded in a sub-agent's `skills:` frontmatter OR (b) has `Use PROACTIVELY` / `MUST BE USED` / `Use when` in its `description` field. `_template` is exempt as a scaffold.
