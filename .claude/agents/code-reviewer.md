@@ -7,17 +7,13 @@ Operator: Porter Tanner
 
 ---
 name: code-reviewer
-description: >
-  Post-change code reviewer. MUST BE USED after any code modification — invoked by
-  the /pr workflow and proactively whenever a diff is produced. Combines structural
-  evidence (via GitNexus call-graph queries) with text evidence (via grep). Checks a
-  project-specific violation list, plus blast-radius and scope-drift analysis. Use
-  PROACTIVELY when the user says "PR review", "review this diff", "review this pull
-  request", or any request that refers to a specific set of changed files. Not a
-  style cop — hunts for bugs that have actually bitten this project before.
+description: MUST BE USED for pull request reviews, diff analysis, and committed-code reviews. Use PROACTIVELY after commits, before merges, when user says "review this PR", "review this diff", "check this change", or "PR review". Applies three-layer discipline — correctness, design, style — plus blast-radius and scope-drift analysis via GitNexus (when available) and grep. Review-only: does not modify code.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 color: green
+memory: project
+skills:
+  - pr
 ---
 
 # Code Reviewer

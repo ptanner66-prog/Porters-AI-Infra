@@ -7,17 +7,13 @@ Operator: Porter Tanner
 
 ---
 name: grep-verifier
-description: >
-  Skeptical code-claim verifier. MUST BE USED when audit findings need independent
-  validation or when any claim about code behavior needs proof. Use PROACTIVELY when
-  the user says "verify X", "confirm Y", "check that Z", or "is that actually true
-  about the code". Labels every claim CONFIRMED / LIKELY / INDETERMINATE / FALSE
-  POSITIVE with grep evidence. Historical false-positive rate in AI-assisted audits
-  is 38-54% — never trust unverified findings. This sub-agent is the bullshit
-  detector for claims about the codebase.
+description: MUST BE USED after any agent claims edits across multiple files, to confirm claimed changes actually exist in files. Use PROACTIVELY when user says "verify", "confirm this change", "did that actually apply", or when R8-style domain-leakage greps need to run. Labels evidence as CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE. Textual verification only — no semantic judgment.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 color: cyan
+memory: project
+skills:
+  - grep-verify
 ---
 
 # Grep Verifier
