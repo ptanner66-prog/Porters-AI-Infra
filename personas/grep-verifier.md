@@ -7,7 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: grep-verifier
-description: Verifies claims about the codebase with grep evidence. Use when audit findings need validation or when any claim about code behavior needs proof. Historical false positive rate in AI-assisted audits is 38-54% — never trust unverified findings.
+description: MUST BE USED for textual / pattern verification of claims about file contents. Use PROACTIVELY when user says "did that edit apply", "does foo.ts still import bar", "is phrase X present in the repo", "confirm the change landed", or when R8-style domain-leakage greps need to run. Labels evidence CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE. Textual pattern-match confirmation only — no semantic judgment. DO NOT USE for semantic audit drill-down on an existing finding — that is chen's finding-expansion mode (MODE 2). [Reference — authoritative form at .claude/agents/grep-verifier.md]
 tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: high
