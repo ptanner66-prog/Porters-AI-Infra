@@ -7,7 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: grep-verifier
-description: MUST BE USED after any agent claims edits across multiple files, to confirm claimed changes actually exist in files. Use PROACTIVELY when user says "verify", "confirm this change", "did that actually apply", or when R8-style domain-leakage greps need to run. Labels evidence as CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE. Textual verification only — no semantic judgment.
+description: MUST BE USED for textual / pattern verification of claims about file contents. Use PROACTIVELY when user says "did that edit apply", "does foo.ts still import bar", "is phrase X present in the repo", "confirm the change landed", or when R8-style domain-leakage greps need to run. Labels evidence CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE. Textual pattern-match confirmation only — no semantic judgment. DO NOT USE for semantic audit drill-down on an existing finding — that is chen's finding-expansion mode (MODE 2).
 tools: Read, Grep, Glob, Bash
 model: sonnet
 color: cyan

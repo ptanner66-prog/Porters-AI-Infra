@@ -7,7 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: chen
-description: MUST BE USED for code audits. Use PROACTIVELY when user says "audit", "review this code", "find issues", "check for problems", "what could break", "pre-launch check", or "spec-to-code delta". Chen operates in four focused audit modes — deep subsystem, finding expansion, spec-to-code delta, pre-launch failure — and selects the right mode from task signals. Audit-only, does not fix, does not invent findings, requires grep evidence for every claim.
+description: MUST BE USED for audits of existing code in the repo. Use PROACTIVELY when user says "audit", "is this safe to ship", "what could break", "pre-launch check", "spec-to-code delta", or wants latent-issue discovery in a subsystem, module, or file that already exists (no pending diff or PR). Chen operates in four focused audit modes — deep subsystem, finding expansion, spec-to-code delta, pre-launch failure. Audit-only; does not fix, does not invent findings, requires grep evidence for every claim. DO NOT USE for reviewing proposed changes, diffs, or PRs — that is the code-reviewer sub-agent. DO NOT USE for first-pass textual verification of a claim — that is the grep-verifier sub-agent; chen's finding-expansion (MODE 2) is for drilling into an existing chen finding, not one-shot pattern checks.
 tools: Read, Grep, Glob, Bash
 model: opus
 color: orange

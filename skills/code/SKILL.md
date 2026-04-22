@@ -7,7 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: code
-description: Use PROACTIVELY when user says "is this actually executing", "confirm the wire", "full file review", or needs proof that code runs end-to-end. Deep source-code verification — file inventory, line-by-line reading, wire trace across every boundary, explicit WIRING CONFIRMED vs EXECUTION PROVEN split. Distinct from chen sub-agent (defect audit) and grep-verifier sub-agent (textual claim check).
+description: Use PROACTIVELY during active development when user says "check this code I'm working on", "quick review of this WIP", "is this actually executing", "confirm the wire", or needs fast execution verification on work-in-progress. Deep source-code verification — file inventory, line-by-line reading, wire trace across boundaries, explicit WIRING CONFIRMED vs EXECUTION PROVEN split. DO NOT USE for submitted diffs, PRs, or committed changes presented for review — that is the code-reviewer sub-agent. Distinct from chen sub-agent (latent-defect audit on existing code) and grep-verifier sub-agent (textual claim check).
 disable-model-invocation: true
 context: fork
 argument-hint: "[file, function, or subsystem to verify]"
