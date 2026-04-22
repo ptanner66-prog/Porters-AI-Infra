@@ -134,3 +134,32 @@ All checks pass — no fixes applied.
 | Architect body retains equivalent "~60 turns" posture guidance | ✓ line 23 |
 | code-reviewer and grep-verifier have their own posture guidance | ✓ both at "~30 turns" (line 23 in each) |
 | Provenance headers on all four extracted Chen audit-mode skills | ✓ all four include `Extracted from: prompts/superprompts/chen-audit-protocol.md § AUDIT MODES — MODE N` |
+
+## Step 12 final verification (2026-04-22)
+
+All v0.3.1 fixes applied and verified:
+
+| Check | Result |
+|---|---|
+| `.claude/agents/` has 4 files with valid YAML frontmatter | ✓ architect, chen, code-reviewer, grep-verifier |
+| Every sub-agent `skills:` entry resolves to real `skills/<name>/SKILL.md` | ✓ swarm, chen, 4×audit-*, pr, grep-verify all present |
+| Every `skills/` directory is OWNED (preloaded) or AUTO (main-session with auto-invoke language) or SCAFFOLD (_template) | ✓ 8 / 16 / 1 = 25 total, zero orphans |
+| No two skill descriptions have substantial overlap that would cause mis-routing | ✓ three v0.3.0 flags resolved in Step 2; four v0.3.1 flags (swarm / gitnexus-debugging / gitnexus-exploring / code-vs-code-reviewer boundary) resolved in Step 3 |
+| `personas/*.md` all have REFERENCE DOC header + synced descriptions | ✓ all four (Step 11 sync) |
+| CLAUDE.md and README.md reflect current `.claude/agents/` + `skills/` inventory | ✓ Steps 6 + 7 cleanup |
+| All 17 dry-run traces route correctly (or flagged with reasoning) | ✓ 14 clean + 3 flagged as operator mental-model mismatches (not description bugs) |
+| No sub-agent frontmatter contains `effort: max` or `maxTurns` | ✓ Step 10 — body-level posture guidance only |
+| All four extracted Chen audit-mode skills have provenance headers | ✓ all four |
+| `.claude/settings.json` is language-agnostic | ✓ Step 8 stripped npx tsc hint and hardcoded npm / port defaults from launch.json |
+| Zero slash references to skill names in active docs | ✓ CLAUDE.md, README.md, AGENTS.md, workflows/\*.md, docs/methodology.md, docs/architecture.md, LEARNINGS.md, BACKLOG.md, .claude/agents/\*.md all clean. VERIFICATION.md preserved as v0.2 historical snapshot with top-of-file disclaimer. docs/build-notes/ preserved unedited. Remaining `/command` references are real commands in `.claude/commands/` not in the operator's skill-name ban list. |
+
+## Summary
+
+The three specific overlaps flagged in the v0.3.0 halt report are resolved with mutually-exclusive DO-NOT-USE carve-outs in each sub-agent description. Four additional overlaps identified during Step 1 audit (swarm skill, gitnexus-debugging, gitnexus-exploring, code-vs-code-reviewer boundary) are also resolved. All main-session skill descriptions carry explicit trigger phrases. Zero skill orphans. Zero frontmatter drift. Zero slash-skill-name references in active user-facing docs.
+
+**Flagged for operator attention (not description bugs):**
+- Dry-run traces #5, #10, #15 expose mismatches between the operator's expected routing and the actual skill purposes for `decide` (surfaces project-pending decisions, not user-option triage), `100` / `soft` (rigor-mode skills, not commit/finish handlers), and `lossy` (pipeline data-loss debugger, not document summarizer).
+- VERIFICATION.md still holds v0.2-era slash references; preserved as a historical record with a top-of-file disclaimer pointing to current convention.
+- Operator listed `/swarm` and `/max` in the slash-ban grep list, but both remain real commands in `.claude/commands/`. Documentation prose no longer uses slash-prefix for them; the command files themselves are unchanged.
+
+Tag-ready at HEAD as v0.3.1.
