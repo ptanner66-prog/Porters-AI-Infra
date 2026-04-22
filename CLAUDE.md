@@ -22,6 +22,8 @@ tanner-stack is a drop-in starter kit for AI-assisted software engineering. It i
 
 **Do not use it as:** a drop-in application, a code-generation library, or something that "does work for you." It is a methodology, not a machine.
 
+This stack auto-dispatches task signals to the right persona, skill, and workflow — see §3.5 for routing rules. Explicit slash commands (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) remain available and override auto-dispatch when you want direct control.
+
 ---
 
 ## 2. Read the Methodology First
@@ -33,6 +35,8 @@ Then skim [docs/architecture.md](docs/architecture.md) to understand current int
 Then read [docs/extending.md](docs/extending.md) before authoring any new persona, skill, command, or rule — it specifies the templates and quality bar.
 
 Then read [AGENTS.md](AGENTS.md) for session-level governance: mode selection (IMPLEMENT / AUDIT / DISCOVERY), parallel-agent rules, model routing, and the GitNexus inviolable mandate. This is the governance layer that sits above the personas — a persona operates *within* one of the session modes defined there.
+
+Finally, internalize §3.5 below (Auto-Dispatch Rules) — the routing table, tool-presence conditionals, and clarification gate that let a session route a user's task to the right persona and skill without waiting for an explicit slash command. Auto-dispatch is part of required onboarding, not optional polish.
 
 If you skip this, you will rediscover pitfalls the stack already encodes.
 
@@ -50,6 +54,101 @@ Personas live in `personas/`. Each declares its mode at the start of every respo
 | **Grep Verifier** | [personas/grep-verifier.md](personas/grep-verifier.md) | Skeptical claim validator. Rates every claim CONFIRMED / LIKELY / FALSE POSITIVE with grep evidence. |
 
 Invocation pattern: read the persona file end-to-end, adopt its identity, declare its mode, and follow its halt rules. Never mix modes in a single response.
+
+---
+
+## 3.5 Auto-Dispatch Rules
+
+A fresh session should read the user's first message and route it to the right persona, skill, and workflow without waiting for an explicit slash command. **Explicit slash commands (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) always override auto-dispatch** — a user who types `/chen` gets Chen, end of story. The rules below define defaults for when the user describes the work in natural language instead.
+
+### 3.5.1 Task-Signal Routing
+
+Consult this table before asking clarifying questions.
+
+| User signal | Default dispatch | Notes |
+|---|---|---|
+| "audit" / "review this" / "is this correct" / "find issues" | **Chen persona.** Pick audit submode per [personas/chen.md § Mode](personas/chen.md): DEEP SUBSYSTEM (broad), FINDING EXPANSION (known defect), SPEC-TO-CODE DELTA (spec comparison), PRE-LAUNCH FAILURE (ship gate). | All four submodes are audit-only. Findings report, no edits. |
+| "fix X" / "resolve Y" / "clean up Z" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 2 (FIX).** If a prior audit report exists in context, resume at Phase 2 with that finding. Otherwise dispatch to Chen first, then Phase 2. | Chen has no FIX mode. The implementing session does the fix per the workflow. |
+| "build X" / "add X" / "create a feature" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 3 (BUILD)** via main session; conclude with `/pr`. | For net-new features without prior code, Phase 1 AUDIT may be skipped. |
+| "refactor" / "restructure" / "reorganize" | **Full audit-fix-build loop** starting with Chen MODE 1 (DEEP SUBSYSTEM) or MODE 2 (FINDING EXPANSION) to map structural scope before any edits. Use `/blast` on all modified symbols. | Refactoring is the highest-risk change class — always audit first. |
+| "PR review" / "review this pull request" / "review this diff" | **[personas/code-reviewer.md](personas/code-reviewer.md)** + **[workflows/pr-review.md](workflows/pr-review.md)**. | Code Reviewer is post-diff, not pre-implementation. |
+| "verify X" / "confirm Y" / "check that Z" | **[personas/grep-verifier.md](personas/grep-verifier.md)** for text-level claims (does file X contain Y?). **Chen MODE 2 (FINDING EXPANSION)** for semantic claims (does subsystem X correctly handle Y?). | Choose by claim type. |
+| "explain this codebase" / "onboard me" / "how does X work" | **[personas/architect.md](personas/architect.md) DISCOVER mode.** If GitNexus is present (see §3.5.2), also `/gitnexus-exploring`. | DISCOVER is read-only; no edits. |
+| "bulk task" / "do X across all files" / "parallel" | `/swarm` — see §3.5.4 for trigger conditions and the go/no-go check. | |
+
+### 3.5.2 Tool-Presence Conditionals
+
+tanner-stack's core (personas, skills, workflows) is always available. External tools may or may not be installed — detect before using.
+
+| Tool | Detection | Use for | If absent |
+|---|---|---|---|
+| **GitNexus** | `.gitnexus/` directory at the project root, or `gitnexus_*` MCP tools visible in the session | Structural queries: who calls X, what depends on Y, blast-radius before edits, safe multi-file renames | Note in LEARNINGS.md that GitNexus is not installed. Fall back to `grep -rn 'importPattern'` for call-graph; manual impact analysis. [personas/code-reviewer.md](personas/code-reviewer.md) runs in degraded mode (grep-only) per its "GitNexus availability contract" section. |
+| **Arsenal** (hook scripts) | `hooks/` directory following Arsenal conventions (pre-commit checks, test runners, verification gates) | Automated invocation of workflows on commit/push events | Invoke workflows manually. Run [workflows/pr-review.md](workflows/pr-review.md) layers by hand rather than via hook. |
+| **Claude Code built-ins** | Always present | File operations, Bash, WebFetch, Grep, Glob, Read, Write, Edit | n/a |
+| **Mythos / Hermes** | Referenced only by the *project-level* `CLAUDE.md` (not by tanner-stack itself) | If a project's CLAUDE.md documents them, follow that guide | Treat as future-integration hooks — see [docs/architecture.md § Future Hook Points](docs/architecture.md). Do not invent invocation for them. |
+
+### 3.5.3 Default Workflow Selection
+
+Once the task is classified per §3.5.1, the corresponding workflow is automatic:
+
+| Task class | Workflow |
+|---|---|
+| Bug, correctness task, refactor | [workflows/audit-fix-build.md](workflows/audit-fix-build.md) |
+| PR review | [workflows/pr-review.md](workflows/pr-review.md) |
+| Creating a commit | [workflows/commit-conventions.md](workflows/commit-conventions.md) |
+| Audit output formatting | [workflows/audit-report-template.md](workflows/audit-report-template.md) |
+| Unknown / ambiguous | **Halt and ask — do not guess.** See §3.5.5. |
+
+### 3.5.4 Swarm Triggering
+
+Invoke `/swarm` when the task is genuinely parallelizable. Skip `/swarm` when the task requires holistic reasoning.
+
+**Trigger `/swarm` if any of these hold:**
+- Task operates across 10+ independent files.
+- No cross-file dependencies between the subtasks.
+- Audit work where findings are independent per subsystem.
+- Bulk refactor following a consistent, mechanical pattern.
+
+**Do NOT swarm when:**
+- Single-file work.
+- Sequential dependencies (subtask B consumes subtask A's output).
+- Architectural changes requiring holistic reasoning about the whole system.
+- Fewer than ~5 files — swarm overhead exceeds benefit.
+
+**Invocation:** `/swarm <task description and target file list>`. Full protocol in [skills/swarm/SKILL.md](skills/swarm/SKILL.md) — decompose by file boundary, deploy up to 5 subagents, synthesize results, no two agents edit the same file. Synthesis step is mandatory.
+
+### 3.5.5 Clarification Gate
+
+**Binding rule.** Halt and ask ONE clarifying question before dispatching when any of these is true:
+
+- The task signal does not clearly match any row in §3.5.1.
+- Two conflicting signals are present (e.g., "audit and fix this" — that's a two-phase workflow, not a single dispatch; confirm whether to run AUDIT first and pause, or run the full loop).
+- The target scope is undefined (which file? which subsystem? which PR?).
+- The desired output shape is ambiguous (findings report vs. implemented fix vs. both).
+
+Ask exactly one question. **Do not chain guesses. Do not propose a menu of possible tasks for the user to pick from.** Once the operator answers, dispatch and proceed. If they answer ambiguously, halt again with a tighter question.
+
+This is not a stuck state. It is the default posture for any non-trivial task. The stack is built on the premise that **clarification cost < misroute cost**.
+
+### 3.5.6 Live Skill Inventory
+
+**Do not trust any hardcoded skill list** — including the categorized list in §4 or the invocation examples scattered through §3.5.1. Skills get added, renamed, or removed as the stack evolves, and a baked-in list drifts silently. The `skills/` directory is the source of truth.
+
+**On session start (or before the first skill dispatch):**
+
+1. `ls skills/` — enumerate skill directory names.
+2. For each directory, read `skills/<name>/SKILL.md` frontmatter. Extract the `name:` and `description:` fields.
+3. Build an in-session map: `skill_name → one-line description`.
+4. Use that map to route §3.5.1 signals to live skills, not the names shown here.
+
+**Edge cases:**
+
+- **Alias skills** (e.g., `/end` → `/session-end`, `/gv` → `/grep-verify`, `/start` → `/session-start`) — both the primary and alias directories have SKILL.md files. Both are valid invocation paths.
+- **Missing skill referenced by name elsewhere in this file or in a persona** — if §3.5.1 or any persona points at a skill that isn't present in `skills/`, halt and tell the operator. Do not substitute silently.
+- **Malformed skill** (directory exists, no SKILL.md, or SKILL.md missing frontmatter) — skip with a note to the operator and continue.
+- **Scope** — this instruction applies to `skills/` only. Commands in `.claude/commands/` and rules in `.claude/rules/` are loaded by the Claude Code harness itself; no manual enumeration is needed there.
+
+Rebuild the inventory whenever you suspect drift — for example, after a git pull, after editing any file under `skills/`, or whenever a referenced skill is not found.
 
 ---
 
@@ -150,6 +249,8 @@ Transform the operator's request into verifiable success criteria before impleme
 > Enforced by: `/diagnose` Phase 3 (FIX PROPOSAL), `/verify` three-leg loop, Chen's EXECUTION PROOF RULE.
 
 _Synthesized from: [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) — Andrej Karpathy's distilled observations on LLM coding pitfalls. Credit to Karpathy and Forrest Chang for the original framing._
+
+The concrete mechanism for activating these principles on any given task is **§3.5 Auto-Dispatch Rules** above. "Surgical changes" (8.3) is operationalized by routing fix / refactor tasks through the audit-fix-build workflow so that scope expansion is blocked by the workflow's halt gates rather than by agent restraint alone. "Goal-driven execution" (8.4) is operationalized by §3.5.5's clarification gate — halt and ask before guessing the goal. Karpathy's principles are the *why*; §3.5 is the *how*.
 
 ---
 
