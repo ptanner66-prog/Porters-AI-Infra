@@ -14,7 +14,7 @@ tanner-stack is a drop-in starter kit for AI-assisted software engineering. It i
 | Asset | Where | What it is |
 |---|---|---|
 | **Sub-agents** | `.claude/agents/` | Named sub-agents (Architect, Chen, Code Reviewer, Grep Verifier) with auto-delegation via `description`-field triggers, declared modes, and staged approval gates. Reference-doc copies at `personas/`. |
-| **Skills** | `skills/` | Single-purpose capabilities invoked by name (`/chen`, `/100`, `/adverse`, `/swarm`, etc.). |
+| **Skills** | `skills/` | Single-purpose capabilities that auto-invoke based on description matching. 8 are preloaded into sub-agents; 16 auto-invoke from the main session. |
 | **Workflows** | `workflows/` | Reusable processes (audit → fix → build loop, PR review, commit conventions, audit-report template). |
 | **Harness config** | `.claude/` | Settings, sub-agents, command shortcuts, rule scaffolds, launch config. |
 
@@ -22,7 +22,7 @@ tanner-stack is a drop-in starter kit for AI-assisted software engineering. It i
 
 **Do not use it as:** a drop-in application, a code-generation library, or something that "does work for you." It is a methodology, not a machine.
 
-This stack auto-dispatches task signals to the right persona, skill, and workflow — see §3.5 for routing rules. Explicit slash commands (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) remain available and override auto-dispatch when you want direct control.
+This stack auto-dispatches task signals to the right sub-agent, skill, and workflow via Claude Code's native delegation — see §3.5 for routing rules. The `.claude/commands/` directory also defines a handful of structured slash-command workflows as overrides for direct control.
 
 ---
 
@@ -71,7 +71,7 @@ Architect and Chen are multi-mode: each declares its mode at the start of every 
 
 ## 3.5 Auto-Dispatch Rules
 
-Routing sub-agents and skills from natural-language task signals is handled primarily by Claude Code's native delegation: each sub-agent's `description` frontmatter field (in `.claude/agents/*.md`) describes when it fires, and Claude Code picks the best match. **Explicit slash commands (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) always override auto-dispatch** — a user who types `/chen` gets Chen, end of story. The tables below document the intended routing for transparency and cover signals that `description` fields alone don't fully encode.
+Routing sub-agents and skills from natural-language task signals is handled primarily by Claude Code's native delegation: each sub-agent's `description` frontmatter field (in `.claude/agents/*.md`) and each main-session skill's `description` field (in `skills/*/SKILL.md`) describe when they fire, and Claude Code picks the best match. **Structured slash-command workflows in `.claude/commands/` always override auto-dispatch** when you want direct control. The tables below document the intended routing for transparency — the `description` fields are authoritative; these tables are advisory.
 
 ### 3.5.1 Task-Signal Routing
 
@@ -81,16 +81,16 @@ Consult this table before asking clarifying questions.
 |---|---|---|
 | "audit" / "review this" / "is this correct" / "find issues" | **[chen sub-agent](.claude/agents/chen.md).** Pick audit submode: DEEP SUBSYSTEM (broad), FINDING EXPANSION (known defect), SPEC-TO-CODE DELTA (spec comparison), PRE-LAUNCH FAILURE (ship gate). | All four submodes are audit-only. Findings report, no edits. |
 | "fix X" / "resolve Y" / "clean up Z" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 2 (FIX).** If a prior audit report exists in context, resume at Phase 2 with that finding. Otherwise dispatch to Chen first, then Phase 2. | Chen has no FIX mode. The implementing session does the fix per the workflow. |
-| "build X" / "add X" / "create a feature" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 3 (BUILD)** via main session; conclude with `/pr`. | For net-new features without prior code, Phase 1 AUDIT may be skipped. |
+| "build X" / "add X" / "create a feature" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 3 (BUILD)** via main session; conclude by auto-invoking the `pr` skill (preloaded in the code-reviewer sub-agent). | For net-new features without prior code, Phase 1 AUDIT may be skipped. |
 | "refactor" / "restructure" / "reorganize" | **Full audit-fix-build loop** starting with Chen MODE 1 (DEEP SUBSYSTEM) or MODE 2 (FINDING EXPANSION) to map structural scope before any edits. Use `/blast` on all modified symbols. | Refactoring is the highest-risk change class — always audit first. |
 | "PR review" / "review this pull request" / "review this diff" | **[code-reviewer sub-agent](.claude/agents/code-reviewer.md)** + **[workflows/pr-review.md](workflows/pr-review.md)**. | Code Reviewer is post-diff, not pre-implementation. |
 | "verify X" / "confirm Y" / "check that Z" | **[grep-verifier sub-agent](.claude/agents/grep-verifier.md)** for text-level claims (does file X contain Y?). **Chen MODE 2 (FINDING EXPANSION)** for semantic claims (does subsystem X correctly handle Y?). | Choose by claim type. |
-| "explain this codebase" / "onboard me" / "how does X work" | **[architect sub-agent](.claude/agents/architect.md) DISCOVER mode.** If GitNexus is present (see §3.5.2), also `/gitnexus-exploring`. | DISCOVER is read-only; no edits. |
-| "bulk task" / "do X across all files" / "parallel" | `/swarm` — see §3.5.4 for trigger conditions and the go/no-go check. | |
+| "explain this codebase" / "onboard me" / "how does X work" | **[architect sub-agent](.claude/agents/architect.md) DISCOVER mode.** If GitNexus is present (see §3.5.2), the `gitnexus-exploring` skill auto-invokes. | DISCOVER is read-only; no edits. |
+| "bulk task" / "do X across all files" / "parallel" / "swarm" | **[architect sub-agent](.claude/agents/architect.md)** — architect decides swarm vs. serial and invokes its preloaded `swarm` skill when warranted. See §3.5.4. | |
 
 ### 3.5.2 Tool-Presence Conditionals
 
-tanner-stack's core (personas, skills, workflows) is always available. External tools may or may not be installed — detect before using.
+tanner-stack's core (sub-agents, skills, workflows) is always available. External tools may or may not be installed — detect before using.
 
 | Tool | Detection | Use for | If absent |
 |---|---|---|---|
@@ -115,9 +115,9 @@ Once the task is classified per §3.5.1, the corresponding workflow is automatic
 
 **Swarm orchestration is architect-owned.** Natural-language signals that imply parallel work ("bulk task", "do X across all files", "parallel", "swarm", "refactor these N files consistently") route to the [architect sub-agent](.claude/agents/architect.md), which decides swarm vs. serial and — if swarm is warranted — invokes its preloaded `swarm` skill with a decomposed task list.
 
-Invoke a swarm when the task is genuinely parallelizable. Skip when the task requires holistic reasoning.
+Trigger a swarm when the task is genuinely parallelizable. Skip when the task requires holistic reasoning.
 
-**Trigger `/swarm` if any of these hold:**
+**Trigger a swarm if any of these hold:**
 - Task operates across 10+ independent files.
 - No cross-file dependencies between the subtasks.
 - Audit work where findings are independent per subsystem.
@@ -129,7 +129,7 @@ Invoke a swarm when the task is genuinely parallelizable. Skip when the task req
 - Architectural changes requiring holistic reasoning about the whole system.
 - Fewer than ~5 files — swarm overhead exceeds benefit.
 
-**Invocation:** `/swarm <task description and target file list>`. Full protocol in [skills/swarm/SKILL.md](skills/swarm/SKILL.md) — decompose by file boundary, deploy up to 5 subagents, synthesize results, no two agents edit the same file. Synthesis step is mandatory.
+**Invocation:** architect decomposes the task and invokes the preloaded `swarm` skill ([skills/swarm/SKILL.md](skills/swarm/SKILL.md)) — decompose by file boundary, deploy up to 5 subagents, synthesize results, no two agents edit the same file. Synthesis step is mandatory.
 
 ### 3.5.5 Clarification Gate
 
@@ -191,7 +191,7 @@ For each internal reference in that file, build an **edge**:
 
 **Edge cases:**
 
-- **Alias skills** (`/end` → `/session-end`, `/gv` → `/grep-verify`, `/start` → `/session-start`) — both the primary and alias directories are separate nodes. Both are valid dispatch targets and the graph preserves both.
+- **Alias skills** — v0.3.0 deleted the separate alias directories (`gv`, `start`, `end`); aliases are now notes on the canonical skill bodies. Treat the canonical as the only node; alias mentions in prose are documentation, not separate dispatch targets.
 - **Malformed markdown** — directory or file exists but frontmatter is unparseable, or the file has no top-level heading — include the node with `frontmatter: null` and `summary: "(unparseable — flagged)"`. Flag to the operator and continue.
 - **Non-markdown references** — files like `.claude/settings.json`, `.claude/launch.json`, or shell scripts may be linked from markdown. Optionally add them as leaf nodes with `type: other` so link-breakage detection still covers them; `frontmatter` and `summary` are n/a.
 - **Scope boundary** — the `.git/` directory is out of scope. `docs/build-notes/` is in scope but every node under it carries `type: other` and a note that the subtree is extraction history, not methodology. `node_modules/` and generated build output (if any) are out of scope.
@@ -204,18 +204,19 @@ The live graph makes routing decisions in §3.5.1 through §3.5.5 resilient to r
 
 **Always check `skills/` before writing a new script, query, prompt, or procedure.** There is a good chance the discipline you need already exists as a named skill.
 
-Invocation is by name: `/chen <target>`, `/100`, `/swarm <task>`, etc.
+Skills auto-invoke based on description matching. You do not need to memorize names — describe the task and the right skill fires. Each skill's `description` frontmatter field names its task signals.
 
-Index by category:
+Index by category (current as of v0.3.1):
 
-- **Rigor modes** (stay active for the session): `/100`, `/zero`, `/soft`, `/shutup`
-- **Adversarial audit**: `/chen`, `/adverse`, `/code`, `/lossy`, `/st`
-- **Verification / diagnosis**: `/grep-verify` (alias `/gv`), `/diagnose`, `/decide`
-- **Session lifecycle**: `/session-start` (alias `/start`), `/session-end` (alias `/end`), `/pr`
-- **Utilities**: `/sql`, `/swarm`
-- **GitNexus integration**: `/gitnexus-cli`, `/gitnexus-debugging`, `/gitnexus-exploring`, `/gitnexus-guide`
+- **Rigor modes** (stay active for the session): `100`, `zero`, `soft`, `shutup`
+- **Adversarial audit / stress-test**: `adverse`, `code`, `lossy`, `st`
+- **Active-bug investigation**: `diagnose`
+- **Decision surfacing**: `decide`
+- **Session lifecycle**: `session-start` (alias `start`), `session-end` (alias `end`), `pr` (preloaded in code-reviewer sub-agent)
+- **GitNexus integration** (auto-invoke only when GitNexus tooling is available): `gitnexus-cli`, `gitnexus-debugging`, `gitnexus-exploring`, `gitnexus-guide`
+- **Sub-agent-preloaded** (not main-session auto-invoke): `chen`, `audit-deep-subsystem`, `audit-finding-expansion`, `audit-spec-to-code-delta`, `audit-pre-launch-failure` (chen sub-agent); `grep-verify` (grep-verifier sub-agent); `swarm` (architect sub-agent — architect-invoked only)
 
-Full catalog under `skills/`. New skills go through [docs/extending.md](docs/extending.md) and the [skills/_template/SKILL.md](skills/_template/SKILL.md) scaffold.
+Full catalog under `skills/`. New skills go through [docs/extending.md](docs/extending.md) and the [skills/_template/SKILL.md](skills/_template/SKILL.md) scaffold. The structured slash-command workflows in `.claude/commands/*.md` (e.g. `blast`, `verify`, `downstream`, `zt`) remain available as overrides.
 
 ---
 
@@ -223,9 +224,9 @@ Full catalog under `skills/`. New skills go through [docs/extending.md](docs/ext
 
 This is the default workflow for any non-trivial change. Full description in [workflows/audit-fix-build.md](workflows/audit-fix-build.md). Summary:
 
-1. **Audit** — invoke `/chen <subsystem>` or a Code Reviewer pass. Produce a findings report with evidence labels and severity. **Do not fix anything in this phase.**
-2. **Fix** — only after audit findings are reviewed and approved. Fix one finding at a time. Run `/grep-verify` on the key claims. Run the project typecheck after every edit.
-3. **Build** — integrate the fixes. Run the full test suite. Run `/adverse` for a completeness check. Open a PR via `/pr` — which delegates back to the Code Reviewer for a final safety pass before submission.
+1. **Audit** — the chen sub-agent auto-delegates from "audit this subsystem" or equivalent signals, OR the code-reviewer sub-agent handles submitted-diff review. Produces a findings report with evidence labels and severity. **Do not fix anything in this phase.**
+2. **Fix** — only after audit findings are reviewed and approved. Fix one finding at a time. The `grep-verify` skill (preloaded in the grep-verifier sub-agent) verifies key claims. Run the project typecheck after every edit.
+3. **Build** — integrate the fixes. Run the full test suite. The `adverse` skill auto-invokes from "what am I missing" for a completeness check. The `pr` skill (preloaded in code-reviewer sub-agent) handles PR submission with a final safety pass.
 
 **Rules:**
 - Never skip the audit phase. "I already know the problem" is how false-positive-rate climbs.
@@ -254,7 +255,7 @@ Every new file under `.claude/agents/`, `personas/`, `skills/`, `workflows/`, `p
 
 **What it is:** a coordination discipline for deploying multiple agents in parallel on independent subtasks, then synthesizing their outputs.
 
-**How to activate it:** invoke `/swarm <task description and target areas>`. Full protocol: [skills/swarm/SKILL.md](skills/swarm/SKILL.md). Command wrapper: [.claude/commands/swarm.md](.claude/commands/swarm.md).
+**How to activate it:** describe a parallel task naturally ("refactor these 40 files consistently", "audit these 12 independent subsystems in parallel"). The architect sub-agent decides swarm vs. serial and, when warranted, invokes its preloaded `swarm` skill. Full protocol: [skills/swarm/SKILL.md](skills/swarm/SKILL.md). A structured command wrapper exists at [.claude/commands/swarm.md](.claude/commands/swarm.md) for direct override.
 
 **Rules:**
 - Decompose by file boundary — no two agents edit the same file.
