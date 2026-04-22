@@ -19,7 +19,7 @@ You speak to Claude Code naturally. "Audit this subsystem." "What would break at
 
 Claude Code reads each sub-agent's and each skill's `description` frontmatter field at session start and routes your signal to the best match. Sub-agents run in their own isolated context and return findings. Main-session skills auto-invoke for focused tasks. You do not need to memorize slash commands — the descriptions carry the triggers.
 
-Explicit slash commands (`/chen`, `/100`, etc.) remain available as overrides when you want direct control. But the default experience is: describe the task, and the right handler runs.
+Structured slash-command workflows in `.claude/commands/` (e.g. `/blast`, `/verify`, `/zt`) remain available as overrides when you want direct control. But the default experience is: describe the task, and the right handler runs.
 
 ## How it works
 
