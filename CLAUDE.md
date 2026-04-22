@@ -130,25 +130,58 @@ Ask exactly one question. **Do not chain guesses. Do not propose a menu of possi
 
 This is not a stuck state. It is the default posture for any non-trivial task. The stack is built on the premise that **clarification cost < misroute cost**.
 
-### 3.5.6 Live Skill Inventory
+### 3.5.6 Live Markdown Cross-Reference Graph
 
-**Do not trust any hardcoded skill list** — including the categorized list in §4 or the invocation examples scattered through §3.5.1. Skills get added, renamed, or removed as the stack evolves, and a baked-in list drifts silently. The `skills/` directory is the source of truth.
+**Do not trust any hardcoded file list, skill list, persona list, or workflow list — anywhere in this document or anywhere else.** Those lists drift silently as the repo evolves. The markdown files themselves are the source of truth. Build a live cross-reference graph on session start and use it for all routing and discovery decisions.
 
-**On session start (or before the first skill dispatch):**
+**Walk these locations on session start:**
 
-1. `ls skills/` — enumerate skill directory names.
-2. For each directory, read `skills/<name>/SKILL.md` frontmatter. Extract the `name:` and `description:` fields.
-3. Build an in-session map: `skill_name → one-line description`.
-4. Use that map to route §3.5.1 signals to live skills, not the names shown here.
+- `CLAUDE.md` (this file), `README.md`, `AGENTS.md`, `LEARNINGS.md`, `BACKLOG.md`
+- `personas/*.md`
+- `skills/*/SKILL.md`
+- `workflows/*.md`
+- `docs/**/*.md`
+- `.claude/rules/*.md`
+- `.claude/commands/*.md`
+
+For each markdown file, build a **node** with:
+
+| Attribute | Value |
+|---|---|
+| `path` | File path relative to repo root |
+| `type` | `skill`, `persona`, `workflow`, `doc`, `rule`, `command`, or `other` — inferred from the directory |
+| `frontmatter` | Parsed YAML frontmatter if present; `null` otherwise |
+| `summary` | One-line summary — from the `description:` frontmatter field if present, else the first prose paragraph after the top-level heading |
+
+For each internal reference in that file, build an **edge**:
+
+- Markdown links: `[label](path/to/other.md)` or `[label](path/to/other.md#anchor)` — anchor targets are edge metadata.
+- File path mentions: bare references like `skills/chen/SKILL.md` appearing in prose or code fences.
+- Frontmatter references: any field value that names another `.md` file.
+
+**Use the graph for:**
+
+1. **"What exists" queries.** `graph.filter(n => n.type === 'skill')` returns all skills. `graph.filter(n => n.type === 'persona')` returns all personas. Etc. The categorized list in §4 and the routing table in §3.5.1 are hints that may be stale; the graph is authoritative.
+2. **Auto-dispatch routing.** When §3.5.1 points at a skill or persona by name, resolve the reference against the graph to confirm the target still exists and look up its one-line summary.
+3. **Drift detection.** Any edge that points to a file not present in the graph is a **broken link**. Report all broken links to the operator at session start as a drift signal. Do not silently continue past a broken link that affects the current task.
+
+**Do not persist the graph.** Build it live in the agent's context on every session start. It is derived state, not committed state. No `.mdgraph.json` artifact, no pre-built index, no cache file in `.claude/`.
+
+**Rebuild triggers:**
+
+- Session start (mandatory).
+- After a `git pull`, `git checkout`, or branch switch.
+- When a referenced file is unexpectedly missing mid-session.
+- When any `.md` file in the walked locations is edited during the session.
 
 **Edge cases:**
 
-- **Alias skills** (e.g., `/end` → `/session-end`, `/gv` → `/grep-verify`, `/start` → `/session-start`) — both the primary and alias directories have SKILL.md files. Both are valid invocation paths.
-- **Missing skill referenced by name elsewhere in this file or in a persona** — if §3.5.1 or any persona points at a skill that isn't present in `skills/`, halt and tell the operator. Do not substitute silently.
-- **Malformed skill** (directory exists, no SKILL.md, or SKILL.md missing frontmatter) — skip with a note to the operator and continue.
-- **Scope** — this instruction applies to `skills/` only. Commands in `.claude/commands/` and rules in `.claude/rules/` are loaded by the Claude Code harness itself; no manual enumeration is needed there.
+- **Alias skills** (`/end` → `/session-end`, `/gv` → `/grep-verify`, `/start` → `/session-start`) — both the primary and alias directories are separate nodes. Both are valid dispatch targets and the graph preserves both.
+- **Malformed markdown** — directory or file exists but frontmatter is unparseable, or the file has no top-level heading — include the node with `frontmatter: null` and `summary: "(unparseable — flagged)"`. Flag to the operator and continue.
+- **Non-markdown references** — files like `.claude/settings.json`, `.claude/launch.json`, or shell scripts may be linked from markdown. Optionally add them as leaf nodes with `type: other` so link-breakage detection still covers them; `frontmatter` and `summary` are n/a.
+- **Scope boundary** — the `.git/` directory is out of scope. `docs/build-notes/` is in scope but every node under it carries `type: other` and a note that the subtree is extraction history, not methodology. `node_modules/` and generated build output (if any) are out of scope.
 
-Rebuild the inventory whenever you suspect drift — for example, after a git pull, after editing any file under `skills/`, or whenever a referenced skill is not found.
+The live graph makes routing decisions in §3.5.1 through §3.5.5 resilient to repo evolution. Anything you would otherwise have to remember from this document becomes a lookup against the graph instead. If §3.5.1 and the graph disagree, the graph wins.
 
 ---
 
