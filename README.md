@@ -7,7 +7,7 @@ A generic, reusable coding-methodology repository. Distilled from a production c
 tanner-stack is a self-teaching starter kit for AI-assisted software engineering. It ships four things:
 
 - **Sub-agents** — four named Claude Code sub-agents at `.claude/agents/` (Architect, Chen, Code Reviewer, Grep Verifier) with auto-delegation driven by each sub-agent's `description` frontmatter field. Architect owns swarm orchestration. Chen operates in four focus modes (deep subsystem, finding expansion, spec-to-code delta, pre-launch failure). Reference-doc copies of each mirror in `personas/`.
-- **Skills** — 25 composable capabilities in `skills/`. Eight are preloaded into sub-agents; sixteen auto-invoke from the main session based on their own `description` triggers; one scaffold (`_template`) for authoring new skills.
+- **Skills** — 28 composable capabilities in `skills/`. Eight are preloaded into sub-agents; nineteen auto-invoke from the main session based on their own `description` triggers; one scaffold (`_template`) for authoring new skills.
 - **Workflows** — reusable processes for audit → fix → build loops, PR review, commit conventions, and incident response.
 - **Infrastructure** — harness configuration (`.claude/`), rule scaffolds, hook points, and a live markdown cross-reference graph built on every session start (see [CLAUDE.md §3.5.6](CLAUDE.md)) so routing stays resilient as the repo evolves.
 
