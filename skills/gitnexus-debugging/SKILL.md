@@ -7,7 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: gitnexus-debugging
-description: "Use when the user is debugging a bug, tracing an error, or asking why something fails. Examples: \"Why is X failing?\", \"Where does this error come from?\", \"Trace this bug\""
+description: "Use when the user is debugging AND GitNexus tooling is available in the session (gitnexus_* MCP tools or .gitnexus/ index present). Leverages GitNexus structural queries (call-graph, upstream/downstream impact, blast-radius) to trace errors. Examples: \"Why is X failing?\", \"Where does this error come from?\", \"Trace this bug through the call graph\". DO NOT USE without GitNexus — use the /diagnose skill for GitNexus-free 4-phase root-cause investigation."
 ---
 
 # Debugging with GitNexus

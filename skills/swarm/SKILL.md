@@ -7,10 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: swarm
-description: >
-  Deploy a swarm of parallel agents to investigate, audit, or implement across multiple
-  files or areas simultaneously. Each agent works in isolated context. Use for broad
-  audits, multi-file investigations, parallel code review, or divide-and-conquer tasks.
+description: Deploy a swarm of parallel agents on isolated subtasks across multiple files or areas. INVOKE ONLY FROM WITHIN the architect sub-agent — architect owns the swarm go/no-go decision. DO NOT auto-fire from main-session "parallel" or "bulk task" signals; those route to architect first, which invokes this skill internally when warranted. Preloaded in .claude/agents/architect.md.
 disable-model-invocation: true
 argument-hint: "[task description and target areas]"
 effort: max

@@ -7,7 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: gitnexus-exploring
-description: "Use when the user asks how code works, wants to understand architecture, trace execution flows, or explore unfamiliar parts of the codebase. Examples: \"How does X work?\", \"What calls this function?\", \"Show me the auth flow\""
+description: "Use when the user wants to explore unfamiliar code AND GitNexus tooling is available in the session (gitnexus_* MCP tools or .gitnexus/ index present). Leverages GitNexus call-graph queries and structural navigation to answer architecture / flow / caller questions. Examples: \"How does X work?\", \"What calls this function?\", \"Show me the auth flow\". DO NOT USE without GitNexus — for GitNexus-free exploration, route to the architect sub-agent's DISCOVER mode."
 ---
 
 # Exploring Codebases with GitNexus
