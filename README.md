@@ -13,6 +13,49 @@ tanner-stack is a self-teaching starter kit for AI-assisted software engineering
 
 The repository is designed to be read **cold** by a future Claude Code session with no prior context. Everything an agent needs to bootstrap is in `CLAUDE.md` and `docs/methodology.md`.
 
+## How it works
+
+Every task runs through this loop:
+
+```
+        ┌─────────────────┐
+        │    Operator     │
+        │  (you or agent) │
+        └────────┬────────┘
+                 │ task
+                 ▼
+        ┌─────────────────┐
+        │    Persona      │  ← personas/
+        │  (mode declared)│
+        └────────┬────────┘
+                 │ invokes
+                 ▼
+        ┌─────────────────┐
+        │     Skills      │  ← skills/
+        │  (/chen, /100)  │
+        └────────┬────────┘
+                 │ executes
+                 ▼
+        ┌─────────────────┐
+        │    Workflow     │  ← workflows/
+        │  (audit→fix→    │
+        │   build, PR)    │
+        └────────┬────────┘
+                 │ outputs
+                 ▼
+        ┌─────────────────┐
+        │     Commit      │
+        │  (conventional) │
+        └────────┬────────┘
+                 │ captures
+                 ▼
+        ┌─────────────────┐
+        │    LEARNINGS    │  ← feeds back into skills/personas
+        └─────────────────┘
+```
+
+Personas declare modes. Skills focus sessions. Workflows structure output. Commits preserve history. Learnings compound.
+
 ## Who this is for
 
 - Consultants installing an AI agent stack for a client's engineering org.
@@ -48,4 +91,4 @@ Extracted from a production Next.js legal-tech codebase and genericized for doma
 
 ## License
 
-ALL RIGHTS RESERVED
+MIT License. See LICENSE file.
