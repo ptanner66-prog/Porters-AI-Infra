@@ -87,7 +87,7 @@ _Add project-specific lessons below as you discover them. Use the format: proble
 
 **The fix:** Every cross-stage handoff that uses serialization, repair, or transformation must (a) log when a size limit is reached, (b) fail loud rather than pass partial data downstream, and (c) include a length/completeness check on the receiving side that rejects obviously-truncated payloads.
 
-**The lesson:** Silent data loss is the worst kind of bug — it produces plausible-looking output that is quietly wrong. Any step that can truncate, repair, coerce, or re-serialize data across a boundary is a ticking time bomb unless you explicitly verify completeness. Apply the `/lossy` skill before trusting any cross-boundary transformation.
+**The lesson:** Silent data loss is the worst kind of bug — it produces plausible-looking output that is quietly wrong. Any step that can truncate, repair, coerce, or re-serialize data across a boundary is a ticking time bomb unless you explicitly verify completeness. Invoke the `lossy` skill before trusting any cross-boundary transformation.
 
 **Detection heuristics:**
 - Look for every `JSON.parse`, `jsonrepair`, or equivalent call — what happens if the input exceeds its limit?
