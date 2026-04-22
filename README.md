@@ -53,16 +53,16 @@ Two tiers: sub-agents with isolated context and preloaded domain skills, and mai
            └─────────┬──────────┘  └─────────┬──────────┘
                      │                       │
                      ▼                       ▼
-     ┌───────────────────────────┐   ┌───────────────────┐
-     │ architect  (swarm boss)   │   │ decide, diagnose, │
-     │ chen       (4 focus modes)│   │ adverse, 100,     │
-     │ code-reviewer             │   │ zero, soft, st,   │
-     │ grep-verifier             │   │ shutup, lossy,    │
-     │                           │   │ code, session-    │
-     │ Each runs in own context  │   │ start/end, and    │
-     │ window. Each returns only │   │ gitnexus-*        │
-     │ summary to main session.  │   │                   │
-     └─────────────┬─────────────┘   └─────────┬─────────┘
+     ┌───────────────────────────┐   ┌──────────────────────┐
+     │ architect  (swarm boss)   │   │ triage, decide,      │
+     │ chen       (4 focus modes)│   │ diagnose, adverse,   │
+     │ code-reviewer             │   │ 100, zero, soft,     │
+     │ grep-verifier             │   │ shutup, st, lossy,   │
+     │                           │   │ code, summarize,     │
+     │ Each runs in own context  │   │ finish, session-     │
+     │ window. Each returns only │   │ start/end, and       │
+     │ summary to main session.  │   │ gitnexus-*           │
+     └─────────────┬─────────────┘   └──────────┬───────────┘
                    │                           │
                    ▼                           ▼
            ┌───────────────┐           ┌───────────────┐
