@@ -46,14 +46,22 @@ If you skip this, you will rediscover pitfalls the stack already encodes.
 
 The four named operating identities (Architect, Chen, Code Reviewer, Grep Verifier) are Claude Code sub-agents at `.claude/agents/*.md`. Claude Code delegates to them automatically based on each sub-agent's `description` frontmatter field. Explicit slash-style invocation (if present in the harness) also works.
 
-| Sub-agent | File | Model | Tools | When to invoke |
-|---|---|---|---|---|
-| **Architect** | [.claude/agents/architect.md](.claude/agents/architect.md) | opus | Read, Write, Edit, Glob, Grep, Bash, WebFetch | Extracting reusable methodology from a production codebase (DISCOVER → EXTRACT → VERIFY). Systems work that needs staged approvals. |
-| **Chen** | [.claude/agents/chen.md](.claude/agents/chen.md) | opus | Read, Grep, Glob, Bash (read-only) | Adversarial systems audit. Deep subsystem audits, finding expansion, spec-to-code deltas, pre-launch failure audits. Four audit modes preloaded as skills. Defers to [prompts/superprompts/chen-audit-protocol.md](prompts/superprompts/chen-audit-protocol.md). |
-| **Code Reviewer** | [.claude/agents/code-reviewer.md](.claude/agents/code-reviewer.md) | sonnet | Read, Grep, Glob, Bash (read-only) | Post-diff review. Combines structural evidence (GitNexus) with text evidence (grep). Applies the project's inviolable-rule list. |
-| **Grep Verifier** | [.claude/agents/grep-verifier.md](.claude/agents/grep-verifier.md) | sonnet | Read, Grep, Glob, Bash (read-only) | Skeptical claim validator. Rates every claim CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE with grep evidence. |
+| Sub-agent | File | Model | Tools | Preloaded Skills | Purpose |
+|---|---|---|---|---|---|
+| **Architect** | [.claude/agents/architect.md](.claude/agents/architect.md) | opus | Read, Write, Edit, Glob, Grep, Bash | `swarm` | System design, repo scaffolding, methodology extraction, staged audit/extract/verify workflows, **and swarm orchestration authority**. |
+| **Chen** | [.claude/agents/chen.md](.claude/agents/chen.md) | opus | Read, Grep, Glob, Bash (read-only) | `chen`, 4 audit modes | Adversarial systems audit via **four focus modes**: DEEP SUBSYSTEM, FINDING EXPANSION, SPEC-TO-CODE DELTA, PRE-LAUNCH FAILURE. Defers to [prompts/superprompts/chen-audit-protocol.md](prompts/superprompts/chen-audit-protocol.md). |
+| **Code Reviewer** | [.claude/agents/code-reviewer.md](.claude/agents/code-reviewer.md) | sonnet | Read, Grep, Glob, Bash (read-only) | `pr` | Post-diff review. Combines structural evidence (GitNexus) with text evidence (grep). Three-layer discipline: correctness, design, style. |
+| **Grep Verifier** | [.claude/agents/grep-verifier.md](.claude/agents/grep-verifier.md) | sonnet | Read, Grep, Glob, Bash (read-only) | `grep-verify` | Skeptical claim validator. Rates every claim CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE with grep evidence. |
 
 **How delegation works:** Claude Code reads each sub-agent's `description` field at session start and routes natural-language signals to the best match. Sub-agents run in isolated contexts and return findings to the main session. The main session decides what to do with them.
+
+> **Swarm orchestration is architect-owned.** Any parallel execution decision — when to swarm, when not to, how to decompose the work — routes through the architect sub-agent. The `swarm` skill is preloaded only in `.claude/agents/architect.md`. Other sub-agents request a swarm *via* architect; they do not invoke it directly.
+
+> **Chen has four focus modes.** Chen declares its audit mode at the start of every invocation based on task signals (see the mode-selection table in [.claude/agents/chen.md](.claude/agents/chen.md)). Chen never mixes modes within a single audit run — focus is the discipline.
+
+> **Sub-agents don't inherit skills from the parent session.** Each sub-agent preloads its own skill set via the `skills:` frontmatter field. A skill the main session has access to is not automatically available to a sub-agent unless listed in that sub-agent's frontmatter.
+
+> **Main-session skills auto-invoke.** The ~16 skills in `skills/` not preloaded in a sub-agent are invoked by the main agent via Claude Code's Skill-tool description matching — no manual slash command needed. Each such skill's `description` field names the task signals that should fire it.
 
 **Persona reference docs** live at `personas/*.md` and mirror the sub-agent content for historical continuity and extension guidance — the sub-agent files in `.claude/agents/` are authoritative.
 
@@ -105,7 +113,9 @@ Once the task is classified per §3.5.1, the corresponding workflow is automatic
 
 ### 3.5.4 Swarm Triggering
 
-Invoke `/swarm` when the task is genuinely parallelizable. Skip `/swarm` when the task requires holistic reasoning.
+**Swarm orchestration is architect-owned.** Natural-language signals that imply parallel work ("bulk task", "do X across all files", "parallel", "swarm", "refactor these N files consistently") route to the [architect sub-agent](.claude/agents/architect.md), which decides swarm vs. serial and — if swarm is warranted — invokes its preloaded `swarm` skill with a decomposed task list.
+
+Invoke a swarm when the task is genuinely parallelizable. Skip when the task requires holistic reasoning.
 
 **Trigger `/swarm` if any of these hold:**
 - Task operates across 10+ independent files.
