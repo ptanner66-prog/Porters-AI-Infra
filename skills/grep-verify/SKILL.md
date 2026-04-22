@@ -21,6 +21,8 @@ allowed-tools: Bash(grep *) Bash(rg *) Bash(find *) Bash(cat *) Bash(head *) Bas
 
 # Grep-Verify — Codebase Claim Verification
 
+> Also invokable as `/gv` (alias). Preloaded in the `grep-verifier` sub-agent.
+
 You are verifying a claim about the codebase against actual source code.
 
 **Claim to verify**: $ARGUMENTS

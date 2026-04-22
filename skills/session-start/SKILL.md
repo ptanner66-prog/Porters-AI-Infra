@@ -14,6 +14,8 @@ allowed-tools: Bash(git *) Bash(curl *) Read
 
 # Session Start Briefing
 
+> Also invokable as `/start` (alias).
+
 You are beginning a new Claude Code session. Below is the pre-loaded state. Review it and present a concise briefing.
 
 ## Pre-Loaded State

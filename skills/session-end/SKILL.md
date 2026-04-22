@@ -14,6 +14,8 @@ allowed-tools: Bash(git *) Bash(grep *) Bash(wc *) Bash(cat *) Bash(find *) Read
 
 # Session End — Handoff Document
 
+> Also invokable as `/end` (alias).
+
 Generate a structured handoff document that captures everything needed for the next session (whether that's the operator pasting into a chat, or the next Claude Code session picking up).
 
 ## Step 1: Capture Git State
