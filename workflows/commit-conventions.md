@@ -69,7 +69,7 @@ The diff shows what. The commit message should explain why.
 
 **Bad**: `feat(skill): add new skill`
 
-**Good**: `feat(skills): add /lossy skill to hunt silent data loss across pipeline boundaries`
+**Good**: `feat(skills): add lossy skill to hunt silent data loss across pipeline boundaries`
 
 ---
 
@@ -130,9 +130,9 @@ This flags the commit for downstream consumers and tooling that respect the Conv
 ## Examples
 
 ```
-feat(skills): add /diagnose — structured 4-phase bug investigation
+feat(skills): add diagnose — structured 4-phase bug investigation
 
-Introduces /diagnose as a skill that runs LOCATE → CONTEXT → ROOT CAUSE →
+Introduces the diagnose skill that runs LOCATE → CONTEXT → ROOT CAUSE →
 FIX PROPOSAL in order, enforcing dead-code-trap checks and explicit
 certainty labels at each phase. Replaces ad-hoc debugging with a
 verification-first protocol.
@@ -158,11 +158,11 @@ Implements: D-COMPAT-SEV-1
 ```
 
 ```
-refactor(session-lifecycle): extract session-start briefing into /start alias
+refactor(skills): add "Also invokable as" alias note on session-start
 
-No behavior change. Existing /session-start skill is preserved. /start
-becomes the 60% shorter alias for daily use. Full protocol still lives
-in session-start/SKILL.md.
+No behavior change. Canonical session-start skill is authoritative;
+operators may still invoke it via the legacy alias when needed. Full
+protocol lives in skills/session-start/SKILL.md.
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
@@ -183,7 +183,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Tools
 
-- `/pr` skill — runs preflight, delegates review, stages specific files, and uses HEREDOC commit messages. It enforces most of the above automatically.
-- `/session-end` and `/end` skills — generate handoff docs that reference the commits made this session.
+- `pr` skill (preloaded in code-reviewer sub-agent) — runs preflight, delegates review, stages specific files, and uses HEREDOC commit messages. It enforces most of the above automatically.
+- `session-end` skill (auto-invokes from "wrap up" / "end session" / "write handoff" signals) — generates handoff docs that reference the commits made this session.
 - `git log --oneline --grep='<type>'` — filter by commit type to see change categories.
 - `git log --oneline --grep='D-<code>'` — find all commits touching a decision code.
