@@ -116,3 +116,21 @@ Traced 17 natural-language task signals against the current (post-Step 2 and Ste
 **Summary:** 14 of 17 traces route cleanly. 3 flagged (#5, #10, #15) are cases where the operator's expected routing does not match the actual skill's purpose — the skill descriptions correctly reflect what the skill does, but the operator's mental model for `decide` / `100` / `soft` / `lossy` was off. These are not description bugs; rewriting the descriptions to match the operator's expectations would misrepresent the skills' actual behavior.
 
 Recommendation: operator reviews the three flagged traces and decides whether to (a) accept current skill purpose (flagged cases fall through to main-session conversational handling), (b) add a new skill to handle the signal (e.g. a `summarize` skill for document compression), or (c) broaden a skill's purpose (and rewrite both description and body).
+
+## Step 10 cross-cutting consistency audit (2026-04-22)
+
+All checks pass — no fixes applied.
+
+| Check | Result |
+|---|---|
+| Four sub-agent `color` fields unique (blue/orange/green/cyan) | ✓ architect=blue, chen=orange, code-reviewer=green, grep-verifier=cyan |
+| All four sub-agent `memory: project` | ✓ all four |
+| Every sub-agent's `tools` list includes Read + Glob + Grep | ✓ all four |
+| Chen's tools list excludes Write and Edit (audit-only) | ✓ `Read, Grep, Glob, Bash` |
+| Architect's tools list includes Write and Edit | ✓ `Read, Write, Edit, Glob, Grep, Bash` |
+| No sub-agent frontmatter contains `effort:` or `maxTurns:` | ✓ none found (only name/description/tools/model/color/memory/skills) |
+| Every sub-agent body contains halt / stop criteria | ✓ architect (§ Authority and Halt Rules), chen (halt on irreducible mode ambiguity + audit-only refusal), code-reviewer (Stop review on P0, BLOCKED verdict), grep-verifier (four-tier verdicts, does-not-self-promote) |
+| Chen body retains "Expected invocation posture: max effort, long runs (design for up to ~80 turns)" | ✓ line 29 |
+| Architect body retains equivalent "~60 turns" posture guidance | ✓ line 23 |
+| code-reviewer and grep-verifier have their own posture guidance | ✓ both at "~30 turns" (line 23 in each) |
+| Provenance headers on all four extracted Chen audit-mode skills | ✓ all four include `Extracted from: prompts/superprompts/chen-audit-protocol.md § AUDIT MODES — MODE N` |
