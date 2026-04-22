@@ -1,5 +1,7 @@
 # Verification Report
 
+> **v0.3.1 note (2026-04-22):** This file is the v0.2-era verification snapshot. Slash-prefixed skill references (`/100`, `/adverse`, `/diagnose`, etc.) in this document reflect the v0.2 invocation convention. v0.3.0 and v0.3.1 superseded that convention with description-based auto-invocation (see CLAUDE.md §3 and §3.5). The historical content is preserved as-is for audit-trail continuity.
+
 **Produced:** 2026-04-21 (MODE 3 / VERIFY)
 **Operator:** Porter Tanner
 **Target:** tanner-stack — cold-start adoption check + R8 additions
