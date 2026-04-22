@@ -6,9 +6,13 @@ How to add new personas, skills, commands, rules, and workflows to this stack.
 
 ---
 
-## Adding a Persona
+## Adding a Sub-Agent (formerly Persona)
 
-Personas live in `personas/`. Each is a markdown file that defines an operating identity.
+Sub-agents live at `.claude/agents/*.md`. Each is a markdown file with YAML frontmatter (`name`, `description`, `tools`, `model`, optional `skills`, `color`) that Claude Code reads for native delegation. A mirror reference-doc copy lives at `personas/<name>.md` for historical continuity and extension guidance.
+
+When adding a new one: create `.claude/agents/<name>.md` first (this is the operational form), then mirror the content to `personas/<name>.md` with a reference-doc header pointing back to the sub-agent file. Keep both in sync on major edits; the sub-agent file is authoritative.
+
+The legacy persona template below still describes the body shape; adapt it to the YAML-frontmatter style used by existing sub-agents in `.claude/agents/`.
 
 **Template:**
 ```markdown

@@ -41,7 +41,7 @@ The current branch must NOT be `main`, `master`, or any name containing `LIVE` o
 
 ### 2. Code Review Delegation
 
-Launch the `code-reviewer` agent via the Agent tool. Pass it the list of changed files. The agent applies this project's violation list (see [personas/code-reviewer.md](../../personas/code-reviewer.md)).
+Delegate to the `code-reviewer` sub-agent (Claude Code native delegation, based on its description trigger, or via the Agent tool). Pass it the list of changed files. The sub-agent applies this project's violation list (see [.claude/agents/code-reviewer.md](../../.claude/agents/code-reviewer.md)).
 
 If the agent returns BLOCKED, stop and relay its findings verbatim.
 

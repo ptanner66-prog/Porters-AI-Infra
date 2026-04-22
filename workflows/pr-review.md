@@ -16,7 +16,7 @@ PR review in tanner-stack is a layered discipline: the author does a preflight, 
 Before opening the PR, the author runs `/pr` which:
 
 1. **Branch safety**: confirms the current branch is not `main` / `master` / `LIVE` / `Production`. Blocks immediately if it is.
-2. **Code Reviewer delegation**: launches the code-reviewer agent (see [personas/code-reviewer.md](../personas/code-reviewer.md)) with the changed-file list. Agent returns CLEAN / WARNINGS / BLOCKED.
+2. **Code Reviewer delegation**: launches the code-reviewer sub-agent (see [.claude/agents/code-reviewer.md](../.claude/agents/code-reviewer.md)) with the changed-file list. Sub-agent returns CLEAN / WARNINGS / BLOCKED.
 3. **Typecheck / lint**: runs the project's typecheck (e.g., `npx tsc --noEmit`, `mypy .`, `cargo check`). Must exit 0.
 4. **Test suite**: runs tests relevant to the changed files.
 5. **Stage and commit**: explicit file-by-file staging (**never** `git add .`). Commit message per [commit-conventions.md](commit-conventions.md).

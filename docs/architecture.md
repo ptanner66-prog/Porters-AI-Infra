@@ -85,7 +85,8 @@ BACKLOG.md ─────────────── written to during sessi
 .claude/rules/*.md ──────── loaded when touching relevant paths
 .claude/commands/*.md ───── invoked via /command-name
 .claude/settings.json ───── loaded by Claude Code harness
-personas/*.md ───────────── loaded on persona declaration
+.claude/agents/*.md ─────── delegated to via Claude Code native sub-agent routing
+personas/*.md ───────────── reference-doc mirror of sub-agents (non-operational)
 skills/*/SKILL.md ───────── invoked via /skill-name
 GitNexus MCP ────────────── optional, loaded when connected
 ```

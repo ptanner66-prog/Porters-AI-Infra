@@ -6,7 +6,7 @@ A generic, reusable coding-methodology repository. Distilled from a production c
 
 tanner-stack is a self-teaching starter kit for AI-assisted software engineering. It ships four things:
 
-- **Personas** — named operating identities (Architect, Chen, Code Reviewer, Grep Verifier) with declared modes and staged approval gates.
+- **Sub-agents** — named Claude Code sub-agents (Architect, Chen, Code Reviewer, Grep Verifier) at `.claude/agents/` with auto-delegation via `description`-field triggers. Reference-doc copies mirror them in `personas/`.
 - **Skills** — composable capabilities invoked by name (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) that focus a session on a single discipline.
 - **Workflows** — reusable processes for audit → fix → build loops, PR review, commit conventions, and incident response.
 - **Infrastructure** — harness configuration (`.claude/`), rule scaffolds, and hook points for parallel-agent coordination.
@@ -25,7 +25,7 @@ Every task runs through this loop:
                  │ task
                  ▼
         ┌─────────────────┐
-        │    Persona      │  ← personas/
+        │    Sub-agent    │  ← .claude/agents/
         │  (mode declared)│
         └────────┬────────┘
                  │ invokes
@@ -78,16 +78,20 @@ tanner-stack/
 │   ├── methodology.md        — how the system works, in plain English
 │   ├── architecture.md       — integration surfaces and hook points
 │   └── extending.md          — how to add new personas, skills, and workflows
-├── personas/                 — operating identities with mode declarations
+├── personas/                 — reference-doc mirror of sub-agents
 ├── skills/                   — single-purpose capabilities
 ├── prompts/                  — superprompts and reusable templates
 ├── workflows/                — audit-fix-build loop, PR review, commit conventions
-└── .claude/                  — harness config (settings, commands, rules)
+└── .claude/
+    ├── agents/               — operational sub-agents (Architect, Chen, Code Reviewer, Grep Verifier)
+    ├── commands/             — slash-command workflows
+    ├── rules/                — path-scoped constraints
+    └── settings.json         — harness config
 ```
 
 ## Provenance
 
-Extracted from a production Next.js legal-tech codebase and genericized for domain-agnostic reuse. Every file under `personas/`, `skills/`, `workflows/`, `docs/`, and `prompts/` carries a provenance header.
+Extracted from a production Next.js legal-tech codebase and genericized for domain-agnostic reuse. Every file under `.claude/agents/`, `personas/`, `skills/`, `workflows/`, `docs/`, and `prompts/` carries a provenance header.
 
 ## License
 
