@@ -117,3 +117,14 @@ The operator's baseline categorization listed `max` as a main-session skill, but
 Every preloaded skill name resolves to a real `skills/<name>/SKILL.md` directory — no orphans, no placeholders.
 
 **Coverage guarantee:** every directory in the final `skills/` inventory is either (a) preloaded in a sub-agent's `skills:` frontmatter OR (b) has `Use PROACTIVELY` / `MUST BE USED` / `Use when` in its `description` field. `_template` is exempt as a scaffold.
+
+---
+
+## v0.3.1 Step 4 orphan re-check (2026-04-22)
+
+Re-verified after the v0.3.1 description-sharpening pass (commits `f011743`, `594423f`):
+
+- OWNED (8): `chen`, `audit-deep-subsystem`, `audit-finding-expansion`, `audit-spec-to-code-delta`, `audit-pre-launch-failure` (→ chen); `pr` (→ code-reviewer); `grep-verify` (→ grep-verifier); `swarm` (→ architect).
+- AUTO (16): `100`, `adverse`, `code`, `decide`, `diagnose`, `gitnexus-cli`, `gitnexus-debugging`, `gitnexus-exploring`, `gitnexus-guide`, `lossy`, `session-end`, `session-start`, `shutup`, `soft`, `st`, `zero` — all have "Use PROACTIVELY" / "Use when" openers with explicit trigger phrases. `gitnexus-debugging` and `gitnexus-exploring` now tool-availability-gated; `swarm` now marked architect-invoked-only.
+- SCAFFOLD (1): `_template`.
+- **Orphans: 0.** Total: 25 directories, all accounted for.
