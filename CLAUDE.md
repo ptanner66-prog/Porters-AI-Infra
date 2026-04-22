@@ -13,10 +13,10 @@ tanner-stack is a drop-in starter kit for AI-assisted software engineering. It i
 
 | Asset | Where | What it is |
 |---|---|---|
-| **Personas** | `personas/` | Named operating identities (Architect, Chen, Code Reviewer, Grep Verifier) with declared modes and staged approval gates. |
+| **Sub-agents** | `.claude/agents/` | Named sub-agents (Architect, Chen, Code Reviewer, Grep Verifier) with auto-delegation via `description`-field triggers, declared modes, and staged approval gates. Reference-doc copies at `personas/`. |
 | **Skills** | `skills/` | Single-purpose capabilities invoked by name (`/chen`, `/100`, `/adverse`, `/swarm`, etc.). |
 | **Workflows** | `workflows/` | Reusable processes (audit → fix → build loop, PR review, commit conventions, audit-report template). |
-| **Harness config** | `.claude/` | Settings, command shortcuts, rule scaffolds, launch config. |
+| **Harness config** | `.claude/` | Settings, sub-agents, command shortcuts, rule scaffolds, launch config. |
 
 **Use it when:** you are installing an AI agent stack for a client's engineering org, starting a new project, or standardizing AI coding discipline across a team.
 
@@ -34,32 +34,36 @@ Then skim [docs/architecture.md](docs/architecture.md) to understand current int
 
 Then read [docs/extending.md](docs/extending.md) before authoring any new persona, skill, command, or rule — it specifies the templates and quality bar.
 
-Then read [AGENTS.md](AGENTS.md) for session-level governance: mode selection (IMPLEMENT / AUDIT / DISCOVERY), parallel-agent rules, model routing, and the GitNexus inviolable mandate. This is the governance layer that sits above the personas — a persona operates *within* one of the session modes defined there.
+Then read [AGENTS.md](AGENTS.md) for session-level governance: mode selection (IMPLEMENT / AUDIT / DISCOVERY), parallel-agent rules, model routing, and the GitNexus inviolable mandate. This is the governance layer that sits above the sub-agents — each sub-agent operates *within* one of the session modes defined there.
 
-Finally, internalize §3.5 below (Auto-Dispatch Rules) — the routing table, tool-presence conditionals, and clarification gate that let a session route a user's task to the right persona and skill without waiting for an explicit slash command. Auto-dispatch is part of required onboarding, not optional polish.
+Finally, internalize §3.5 below (Auto-Dispatch Rules) — the signal→sub-agent mapping that documents how Claude Code's native delegation routes a user's task. Routing is driven by each sub-agent's `description` frontmatter field in `.claude/agents/`, not by instructions in this doc. The tables in §3.5 exist for transparency and to cover signals that the `description` fields don't directly encode.
 
 If you skip this, you will rediscover pitfalls the stack already encodes.
 
 ---
 
-## 3. Personas — How to Pick One
+## 3. Sub-Agents — How They Get Picked
 
-Personas live in `personas/`. Each declares its mode at the start of every response and halts between modes for operator approval.
+The four named operating identities (Architect, Chen, Code Reviewer, Grep Verifier) are Claude Code sub-agents at `.claude/agents/*.md`. Claude Code delegates to them automatically based on each sub-agent's `description` frontmatter field. Explicit slash-style invocation (if present in the harness) also works.
 
-| Persona | File | When to invoke |
-|---|---|---|
-| **Architect** | [personas/architect.md](personas/architect.md) | Extracting reusable methodology from a production codebase (DISCOVER → EXTRACT → VERIFY). Also for systems work that needs staged approvals. |
-| **Chen** | [personas/chen.md](personas/chen.md) | Adversarial systems audit — hostile, evidence-driven. Deep subsystem audits, finding expansion, spec-to-code deltas, pre-launch failure audits. Defers to [prompts/superprompts/chen-audit-protocol.md](prompts/superprompts/chen-audit-protocol.md). |
-| **Code Reviewer** | [personas/code-reviewer.md](personas/code-reviewer.md) | Post-diff review. Combines structural evidence (GitNexus) with text evidence (grep). Applies the project's inviolable-rule list. |
-| **Grep Verifier** | [personas/grep-verifier.md](personas/grep-verifier.md) | Skeptical claim validator. Rates every claim CONFIRMED / LIKELY / FALSE POSITIVE with grep evidence. |
+| Sub-agent | File | Model | Tools | When to invoke |
+|---|---|---|---|---|
+| **Architect** | [.claude/agents/architect.md](.claude/agents/architect.md) | opus | Read, Write, Edit, Glob, Grep, Bash, WebFetch | Extracting reusable methodology from a production codebase (DISCOVER → EXTRACT → VERIFY). Systems work that needs staged approvals. |
+| **Chen** | [.claude/agents/chen.md](.claude/agents/chen.md) | opus | Read, Grep, Glob, Bash (read-only) | Adversarial systems audit. Deep subsystem audits, finding expansion, spec-to-code deltas, pre-launch failure audits. Four audit modes preloaded as skills. Defers to [prompts/superprompts/chen-audit-protocol.md](prompts/superprompts/chen-audit-protocol.md). |
+| **Code Reviewer** | [.claude/agents/code-reviewer.md](.claude/agents/code-reviewer.md) | sonnet | Read, Grep, Glob, Bash (read-only) | Post-diff review. Combines structural evidence (GitNexus) with text evidence (grep). Applies the project's inviolable-rule list. |
+| **Grep Verifier** | [.claude/agents/grep-verifier.md](.claude/agents/grep-verifier.md) | sonnet | Read, Grep, Glob, Bash (read-only) | Skeptical claim validator. Rates every claim CONFIRMED / LIKELY / INDETERMINATE / FALSE POSITIVE with grep evidence. |
 
-Invocation pattern: read the persona file end-to-end, adopt its identity, declare its mode, and follow its halt rules. Never mix modes in a single response.
+**How delegation works:** Claude Code reads each sub-agent's `description` field at session start and routes natural-language signals to the best match. Sub-agents run in isolated contexts and return findings to the main session. The main session decides what to do with them.
+
+**Persona reference docs** live at `personas/*.md` and mirror the sub-agent content for historical continuity and extension guidance — the sub-agent files in `.claude/agents/` are authoritative.
+
+Architect and Chen are multi-mode: each declares its mode at the start of every response and halts between modes for operator approval. Never mix modes in a single response.
 
 ---
 
 ## 3.5 Auto-Dispatch Rules
 
-A fresh session should read the user's first message and route it to the right persona, skill, and workflow without waiting for an explicit slash command. **Explicit slash commands (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) always override auto-dispatch** — a user who types `/chen` gets Chen, end of story. The rules below define defaults for when the user describes the work in natural language instead.
+Routing sub-agents and skills from natural-language task signals is handled primarily by Claude Code's native delegation: each sub-agent's `description` frontmatter field (in `.claude/agents/*.md`) describes when it fires, and Claude Code picks the best match. **Explicit slash commands (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) always override auto-dispatch** — a user who types `/chen` gets Chen, end of story. The tables below document the intended routing for transparency and cover signals that `description` fields alone don't fully encode.
 
 ### 3.5.1 Task-Signal Routing
 
@@ -67,13 +71,13 @@ Consult this table before asking clarifying questions.
 
 | User signal | Default dispatch | Notes |
 |---|---|---|
-| "audit" / "review this" / "is this correct" / "find issues" | **Chen persona.** Pick audit submode per [personas/chen.md § Mode](personas/chen.md): DEEP SUBSYSTEM (broad), FINDING EXPANSION (known defect), SPEC-TO-CODE DELTA (spec comparison), PRE-LAUNCH FAILURE (ship gate). | All four submodes are audit-only. Findings report, no edits. |
+| "audit" / "review this" / "is this correct" / "find issues" | **[chen sub-agent](.claude/agents/chen.md).** Pick audit submode: DEEP SUBSYSTEM (broad), FINDING EXPANSION (known defect), SPEC-TO-CODE DELTA (spec comparison), PRE-LAUNCH FAILURE (ship gate). | All four submodes are audit-only. Findings report, no edits. |
 | "fix X" / "resolve Y" / "clean up Z" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 2 (FIX).** If a prior audit report exists in context, resume at Phase 2 with that finding. Otherwise dispatch to Chen first, then Phase 2. | Chen has no FIX mode. The implementing session does the fix per the workflow. |
 | "build X" / "add X" / "create a feature" | **[workflows/audit-fix-build.md](workflows/audit-fix-build.md) Phase 3 (BUILD)** via main session; conclude with `/pr`. | For net-new features without prior code, Phase 1 AUDIT may be skipped. |
 | "refactor" / "restructure" / "reorganize" | **Full audit-fix-build loop** starting with Chen MODE 1 (DEEP SUBSYSTEM) or MODE 2 (FINDING EXPANSION) to map structural scope before any edits. Use `/blast` on all modified symbols. | Refactoring is the highest-risk change class — always audit first. |
-| "PR review" / "review this pull request" / "review this diff" | **[personas/code-reviewer.md](personas/code-reviewer.md)** + **[workflows/pr-review.md](workflows/pr-review.md)**. | Code Reviewer is post-diff, not pre-implementation. |
-| "verify X" / "confirm Y" / "check that Z" | **[personas/grep-verifier.md](personas/grep-verifier.md)** for text-level claims (does file X contain Y?). **Chen MODE 2 (FINDING EXPANSION)** for semantic claims (does subsystem X correctly handle Y?). | Choose by claim type. |
-| "explain this codebase" / "onboard me" / "how does X work" | **[personas/architect.md](personas/architect.md) DISCOVER mode.** If GitNexus is present (see §3.5.2), also `/gitnexus-exploring`. | DISCOVER is read-only; no edits. |
+| "PR review" / "review this pull request" / "review this diff" | **[code-reviewer sub-agent](.claude/agents/code-reviewer.md)** + **[workflows/pr-review.md](workflows/pr-review.md)**. | Code Reviewer is post-diff, not pre-implementation. |
+| "verify X" / "confirm Y" / "check that Z" | **[grep-verifier sub-agent](.claude/agents/grep-verifier.md)** for text-level claims (does file X contain Y?). **Chen MODE 2 (FINDING EXPANSION)** for semantic claims (does subsystem X correctly handle Y?). | Choose by claim type. |
+| "explain this codebase" / "onboard me" / "how does X work" | **[architect sub-agent](.claude/agents/architect.md) DISCOVER mode.** If GitNexus is present (see §3.5.2), also `/gitnexus-exploring`. | DISCOVER is read-only; no edits. |
 | "bulk task" / "do X across all files" / "parallel" | `/swarm` — see §3.5.4 for trigger conditions and the go/no-go check. | |
 
 ### 3.5.2 Tool-Presence Conditionals
@@ -82,7 +86,7 @@ tanner-stack's core (personas, skills, workflows) is always available. External 
 
 | Tool | Detection | Use for | If absent |
 |---|---|---|---|
-| **GitNexus** | `.gitnexus/` directory at the project root, or `gitnexus_*` MCP tools visible in the session | Structural queries: who calls X, what depends on Y, blast-radius before edits, safe multi-file renames | Note in LEARNINGS.md that GitNexus is not installed. Fall back to `grep -rn 'importPattern'` for call-graph; manual impact analysis. [personas/code-reviewer.md](personas/code-reviewer.md) runs in degraded mode (grep-only) per its "GitNexus availability contract" section. |
+| **GitNexus** | `.gitnexus/` directory at the project root, or `gitnexus_*` MCP tools visible in the session | Structural queries: who calls X, what depends on Y, blast-radius before edits, safe multi-file renames | Note in LEARNINGS.md that GitNexus is not installed. Fall back to `grep -rn 'importPattern'` for call-graph; manual impact analysis. [code-reviewer sub-agent](.claude/agents/code-reviewer.md) runs in degraded mode (grep-only) per its "GitNexus availability contract" section. |
 | **Arsenal** (hook scripts) | `hooks/` directory following Arsenal conventions (pre-commit checks, test runners, verification gates) | Automated invocation of workflows on commit/push events | Invoke workflows manually. Run [workflows/pr-review.md](workflows/pr-review.md) layers by hand rather than via hook. |
 | **Claude Code built-ins** | Always present | File operations, Bash, WebFetch, Grep, Glob, Read, Write, Edit | n/a |
 | **Mythos / Hermes** | Referenced only by the *project-level* `CLAUDE.md` (not by tanner-stack itself) | If a project's CLAUDE.md documents them, follow that guide | Treat as future-integration hooks — see [docs/architecture.md § Future Hook Points](docs/architecture.md). Do not invent invocation for them. |
@@ -137,7 +141,8 @@ This is not a stuck state. It is the default posture for any non-trivial task. T
 **Walk these locations on session start:**
 
 - `CLAUDE.md` (this file), `README.md`, `AGENTS.md`, `LEARNINGS.md`, `BACKLOG.md`
-- `personas/*.md`
+- `.claude/agents/*.md` (authoritative sub-agents)
+- `personas/*.md` (reference-doc copies)
 - `skills/*/SKILL.md`
 - `workflows/*.md`
 - `docs/**/*.md`
@@ -149,7 +154,7 @@ For each markdown file, build a **node** with:
 | Attribute | Value |
 |---|---|
 | `path` | File path relative to repo root |
-| `type` | `skill`, `persona`, `workflow`, `doc`, `rule`, `command`, or `other` — inferred from the directory |
+| `type` | `sub-agent`, `persona`, `skill`, `workflow`, `doc`, `rule`, `command`, or `other` — inferred from the directory |
 | `frontmatter` | Parsed YAML frontmatter if present; `null` otherwise |
 | `summary` | One-line summary — from the `description:` frontmatter field if present, else the first prose paragraph after the top-level heading |
 
@@ -161,8 +166,8 @@ For each internal reference in that file, build an **edge**:
 
 **Use the graph for:**
 
-1. **"What exists" queries.** `graph.filter(n => n.type === 'skill')` returns all skills. `graph.filter(n => n.type === 'persona')` returns all personas. Etc. The categorized list in §4 and the routing table in §3.5.1 are hints that may be stale; the graph is authoritative.
-2. **Auto-dispatch routing.** When §3.5.1 points at a skill or persona by name, resolve the reference against the graph to confirm the target still exists and look up its one-line summary.
+1. **"What exists" queries.** `graph.filter(n => n.type === 'skill')` returns all skills. `graph.filter(n => n.type === 'sub-agent')` returns all sub-agents. `graph.filter(n => n.type === 'persona')` returns the reference-doc mirror. Etc. The categorized list in §4 and the routing table in §3.5.1 are hints that may be stale; the graph is authoritative.
+2. **Auto-dispatch routing.** When §3.5.1 points at a sub-agent or skill by name, resolve the reference against the graph to confirm the target still exists and look up its one-line summary. If the `.claude/agents/<name>.md` node is present, its `description` field is the canonical delegation trigger; the §3.5.1 row is advisory.
 3. **Drift detection.** Any edge that points to a file not present in the graph is a **broken link**. Report all broken links to the operator at session start as a drift signal. Do not silently continue past a broken link that affects the current task.
 
 **Do not persist the graph.** Build it live in the agent's context on every session start. It is derived state, not committed state. No `.mdgraph.json` artifact, no pre-built index, no cache file in `.claude/`.
@@ -225,13 +230,13 @@ PR discipline: [workflows/pr-review.md](workflows/pr-review.md). Commit messages
 
 When you need something the stack doesn't already provide, **add it through the extending workflow, not ad-hoc**:
 
-- **New persona** → copy a `personas/` file as a starting point, follow [docs/extending.md § Adding a Persona](docs/extending.md).
+- **New sub-agent** → copy a `.claude/agents/` file as a starting point, then mirror a reference-doc copy in `personas/`. Follow [docs/extending.md § Adding a Persona](docs/extending.md).
 - **New skill** → `cp -r skills/_template skills/<name>`, fill in the slots, follow [docs/extending.md § Adding a Skill](docs/extending.md).
 - **New command** → add a short `.md` under `.claude/commands/`; if it overlaps with a skill, the command is a thin wrapper that delegates.
 - **New rule** → add a `.md` under `.claude/rules/`, following the pattern in [example-rule.md](.claude/rules/example-rule.md) (path-scoped DO NOT list, architecture notes, thresholds, key files).
 - **New workflow** → add a `.md` under `workflows/`, modeled on the existing three.
 
-Every new file under `personas/`, `skills/`, `workflows/`, `prompts/`, and `docs/` must carry a provenance header (see [docs/extending.md § Provenance Headers](docs/extending.md)).
+Every new file under `.claude/agents/`, `personas/`, `skills/`, `workflows/`, `prompts/`, and `docs/` must carry a provenance header (see [docs/extending.md § Provenance Headers](docs/extending.md)).
 
 ---
 
