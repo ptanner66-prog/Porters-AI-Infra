@@ -211,7 +211,9 @@ Index by category (current as of v0.3.1):
 - **Rigor modes** (stay active for the session): `100`, `zero`, `soft`, `shutup`
 - **Adversarial audit / stress-test**: `adverse`, `code`, `lossy`, `st`
 - **Active-bug investigation**: `diagnose`
-- **Decision surfacing**: `decide`
+- **Decision support**: `triage` (structured option comparison when user presents 2+ choices), `decide` (surfaces pending project decisions)
+- **Task completion**: `finish` (commit-and-close-out on in-progress work; distinct from `pr` for PR submission)
+- **Document compression**: `summarize` (length-targeted compression with signal preservation; distinct from `lossy` which debugs pipeline data loss)
 - **Session lifecycle**: `session-start` (alias `start`), `session-end` (alias `end`), `pr` (preloaded in code-reviewer sub-agent)
 - **GitNexus integration** (auto-invoke only when GitNexus tooling is available): `gitnexus-cli`, `gitnexus-debugging`, `gitnexus-exploring`, `gitnexus-guide`
 - **Sub-agent-preloaded** (not main-session auto-invoke): `chen`, `audit-deep-subsystem`, `audit-finding-expansion`, `audit-spec-to-code-delta`, `audit-pre-launch-failure` (chen sub-agent); `grep-verify` (grep-verifier sub-agent); `swarm` (architect sub-agent — architect-invoked only)
