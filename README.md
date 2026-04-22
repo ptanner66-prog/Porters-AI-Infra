@@ -6,55 +6,81 @@ A generic, reusable coding-methodology repository. Distilled from a production c
 
 tanner-stack is a self-teaching starter kit for AI-assisted software engineering. It ships four things:
 
-- **Sub-agents** — named Claude Code sub-agents (Architect, Chen, Code Reviewer, Grep Verifier) at `.claude/agents/` with auto-delegation via `description`-field triggers. Reference-doc copies mirror them in `personas/`.
-- **Skills** — composable capabilities invoked by name (`/chen`, `/100`, `/adverse`, `/swarm`, etc.) that focus a session on a single discipline.
+- **Sub-agents** — four named Claude Code sub-agents at `.claude/agents/` (Architect, Chen, Code Reviewer, Grep Verifier) with auto-delegation driven by each sub-agent's `description` frontmatter field. Architect owns swarm orchestration. Chen operates in four focus modes (deep subsystem, finding expansion, spec-to-code delta, pre-launch failure). Reference-doc copies of each mirror in `personas/`.
+- **Skills** — 25 composable capabilities in `skills/`. Eight are preloaded into sub-agents; sixteen auto-invoke from the main session based on their own `description` triggers; one scaffold (`_template`) for authoring new skills.
 - **Workflows** — reusable processes for audit → fix → build loops, PR review, commit conventions, and incident response.
-- **Infrastructure** — harness configuration (`.claude/`), rule scaffolds, and hook points for parallel-agent coordination.
+- **Infrastructure** — harness configuration (`.claude/`), rule scaffolds, hook points, and a live markdown cross-reference graph built on every session start (see [CLAUDE.md §3.5.6](CLAUDE.md)) so routing stays resilient as the repo evolves.
 
 The repository is designed to be read **cold** by a future Claude Code session with no prior context. Everything an agent needs to bootstrap is in `CLAUDE.md` and `docs/methodology.md`.
 
+## No slashes, no /commands — auto-dispatch
+
+You speak to Claude Code naturally. "Audit this subsystem." "What would break at launch?" "Verify this claim." "Refactor these 40 files consistently."
+
+Claude Code reads each sub-agent's and each skill's `description` frontmatter field at session start and routes your signal to the best match. Sub-agents run in their own isolated context and return findings. Main-session skills auto-invoke for focused tasks. You do not need to memorize slash commands — the descriptions carry the triggers.
+
+Explicit slash commands (`/chen`, `/100`, etc.) remain available as overrides when you want direct control. But the default experience is: describe the task, and the right handler runs.
+
 ## How it works
 
-Every task runs through this loop:
+Two tiers: sub-agents with isolated context and preloaded domain skills, and main-session skills that auto-invoke for focused work.
 
 ```
-        ┌─────────────────┐
-        │    Operator     │
-        │  (you or agent) │
-        └────────┬────────┘
-                 │ task
-                 ▼
-        ┌─────────────────┐
-        │    Sub-agent    │  ← .claude/agents/
-        │  (mode declared)│
-        └────────┬────────┘
-                 │ invokes
-                 ▼
-        ┌─────────────────┐
-        │     Skills      │  ← skills/
-        │  (/chen, /100)  │
-        └────────┬────────┘
-                 │ executes
-                 ▼
-        ┌─────────────────┐
-        │    Workflow     │  ← workflows/
-        │  (audit→fix→    │
-        │   build, PR)    │
-        └────────┬────────┘
-                 │ outputs
-                 ▼
-        ┌─────────────────┐
-        │     Commit      │
-        │  (conventional) │
-        └────────┬────────┘
-                 │ captures
-                 ▼
-        ┌─────────────────┐
-        │    LEARNINGS    │  ← feeds back into skills/personas
-        └─────────────────┘
+                    ┌─────────────────────────────┐
+                    │      Your Task Signal       │
+                    │   (spoken naturally, no     │
+                    │    slashes, no /commands)   │
+                    └──────────────┬──────────────┘
+                                   │
+                                   ▼
+                    ┌─────────────────────────────┐
+                    │    Claude Code Native       │
+                    │    Auto-Dispatch Engine     │
+                    └──────────────┬──────────────┘
+                                   │
+                        ┌──────────┴──────────┐
+                        │                     │
+                        ▼                     ▼
+           ┌────────────────────┐  ┌────────────────────┐
+           │    SUB-AGENTS      │  │  MAIN-SESSION      │
+           │  (.claude/agents/) │  │     SKILLS         │
+           │                    │  │    (skills/)       │
+           │  Isolated context, │  │                    │
+           │  preloaded skills  │  │  Invoked live by   │
+           │                    │  │  Skill tool based  │
+           │                    │  │  on description    │
+           │                    │  │  matching          │
+           └─────────┬──────────┘  └─────────┬──────────┘
+                     │                       │
+                     ▼                       ▼
+     ┌───────────────────────────┐   ┌───────────────────┐
+     │ architect  (swarm boss)   │   │ decide, diagnose, │
+     │ chen       (4 focus modes)│   │ adverse, 100,     │
+     │ code-reviewer             │   │ zero, soft, st,   │
+     │ grep-verifier             │   │ shutup, lossy,    │
+     │                           │   │ code, session-    │
+     │ Each runs in own context  │   │ start/end, and    │
+     │ window. Each returns only │   │ gitnexus-*        │
+     │ summary to main session.  │   │                   │
+     └─────────────┬─────────────┘   └─────────┬─────────┘
+                   │                           │
+                   ▼                           ▼
+           ┌───────────────┐           ┌───────────────┐
+           │   Commit(s)   │           │ Task complete │
+           │  via workflows│           │ in-session    │
+           └───────┬───────┘           └───────┬───────┘
+                   │                           │
+                   └─────────────┬─────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────────┐
+                    │     LEARNINGS captured      │
+                    │   (feeds back to skills     │
+                    │    and sub-agent memory)    │
+                    └─────────────────────────────┘
 ```
 
-Personas declare modes. Skills focus sessions. Workflows structure output. Commits preserve history. Learnings compound.
+Sub-agents handle personas with isolated context and preloaded domain skills. Main-session skills auto-invoke based on task signals. Architect owns swarm orchestration. Chen runs in four focus modes. You speak naturally — Claude Code routes.
 
 ## Who this is for
 
