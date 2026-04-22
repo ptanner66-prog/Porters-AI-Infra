@@ -163,3 +163,47 @@ The three specific overlaps flagged in the v0.3.0 halt report are resolved with 
 - Operator listed `/swarm` and `/max` in the slash-ban grep list, but both remain real commands in `.claude/commands/`. Documentation prose no longer uses slash-prefix for them; the command files themselves are unchanged.
 
 Tag-ready at HEAD as v0.3.1.
+
+---
+
+## Post-script: v0.3.1 Trace-gap closures (2026-04-22)
+
+After the Step 12 halt flagged traces #5, #10, #15 as operator-expectation / skill-purpose mismatches, the operator requested the gaps be closed by adding three new skills rather than accepting fall-through to main-session conversational handling. Three new Category B skills landed:
+
+| Commit | Skill | Closes | Description opener |
+|---|---|---|---|
+| `b99c908` | [triage](../../skills/triage/SKILL.md) | Trace #5 | `Use PROACTIVELY when user says "help me decide between", "which should I pick", "A or B", "what's better", or presents 2+ explicit options for comparison.` |
+| `1669424` | [finish](../../skills/finish/SKILL.md) | Trace #10 | `Use PROACTIVELY when user says "commit and finish", "wrap this up", "close this out", "finish what you started", "ship it", or signals end-of-task closure on in-progress work.` |
+| `a4c4dff` | [summarize](../../skills/summarize/SKILL.md) | Trace #15 | `MUST BE USED when user says "summarize this document", "compress this", "give me the short version", "tldr this", or pastes long content and asks for a condensed version.` |
+
+### Re-trace confirmation
+
+| # | Signal | Expected | Actual routing (v0.3.1 post-fix) | OK? |
+|---|---|---|---|---|
+| 5 | "Help me decide between option A and B" | triage | triage — phrase contains both "help me decide between" and "A or B" explicit trigger phrases. decide description explicitly carves out ("NOT for deciding between options the user just presented"). | ✓ |
+| 10 | "Commit and finish what you started" | finish | finish — phrase contains both "commit and finish" and "finish what you started" explicit trigger phrases. pr description scoped to "open a PR / submit this"; 100/soft/zero are rigor modes with orthogonal triggers. | ✓ |
+| 15 | "Summarize this long document" | summarize | summarize — phrase contains "summarize this document" explicit trigger phrase. lossy description scoped to "data mysteriously degraded / values dropped between stages"; shutup scoped to silencing signals. Both have explicit carve-outs in summarize's description. | ✓ |
+
+### New-overlap-risk check
+
+Each new skill description carries explicit `DO NOT USE for X — that is the Y skill` carve-outs paired with the sibling it was originally confused with:
+
+| New skill | Carve-out pairs | Sibling trigger (confirmed non-overlap) |
+|---|---|---|
+| `triage` | `decide` | decide fires on "what's blocking me" / "where are we stuck" — distinct from option-comparison signals |
+| `finish` | `pr` | pr fires on "open a PR" / "submit this" — distinct from commit-and-close-out signals |
+| `finish` | `100` / `soft` / `zero` | rigor modes fire on "no margin for error" / "no guessing" / "no false positives" — orthogonal to commit/finish |
+| `summarize` | `lossy` | lossy fires on pipeline-data-loss debugging signals — distinct from document-compression |
+| `summarize` | `shutup` | shutup fires on "stop talking" / silencing signals — distinct from compression-with-preservation |
+
+No new overlaps introduced. All three re-traces route cleanly.
+
+### Final state
+
+- `skills/` inventory: **28** directories (Category A: 8; Category B: 19; Scaffold: 1). Zero orphans.
+- Sub-agent descriptions and skill descriptions are all SHARP with explicit triggers and carve-outs.
+- All original v0.3.0 + v0.3.1 overlap flags are resolved.
+- CLAUDE.md §4 and README.md architecture diagram both updated with the three new skills.
+- Skill audit doc (`skill-audit-2026-04-21.md`) carries the v0.3.1 addition record.
+
+Tag-ready at HEAD as v0.3.1.
