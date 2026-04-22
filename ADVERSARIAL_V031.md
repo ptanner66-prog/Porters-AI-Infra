@@ -78,6 +78,17 @@ Columns:
 
 (Other descriptions are SHARP with differentiators already present; no action needed.)
 
+## Step 5 sub-agent preload verification (2026-04-22)
+
+All four sub-agent `skills:` frontmatter lists were checked against skill references in their bodies:
+
+- **architect** → preloads `swarm`. Body references the preloaded `swarm` skill in its Swarm Orchestration section. ✓ complete.
+- **chen** → preloads `chen`, `audit-deep-subsystem`, `audit-finding-expansion`, `audit-spec-to-code-delta`, `audit-pre-launch-failure`. Body's Focus Modes section references each preloaded mode-specific skill by name. ✓ complete.
+- **code-reviewer** → preloads `pr`. Body references `/pr` in the single-mode description. ✓ complete.
+- **grep-verifier** → preloads `grep-verify`. Body has no other skill references. ✓ complete.
+
+**No preload corrections needed.** All skill names resolve 1:1 to existing `skills/<name>/SKILL.md` directories.
+
 ## Dry-run trace placeholder
 
 17 routing simulations to be populated in Step 9 after all fixes applied.
