@@ -64,14 +64,14 @@ Personas are declared at session start. They're not personas in a theatrical sen
 
 ## The Skill Layer
 
-Skills are single-purpose capabilities invoked by name (`/chen`, `/100`, `/adverse`, etc.). Each skill changes the session's operating standard in a specific way:
+Skills are single-purpose capabilities that auto-invoke based on description matching — each skill's `description` frontmatter field names the task signals that should fire it. Each skill changes the session's operating standard in a specific way:
 
-- `/chen` — activates the adversarial audit protocol
-- `/100` — requires file:line proof for every claim
-- `/zero` — activates zero false positives / zero false negatives mode
-- `/max` — activates all three simultaneously
+- `chen` — activates the adversarial audit protocol (preloaded in the chen sub-agent)
+- `100` — requires file:line proof for every claim
+- `zero` — activates zero false positives / zero false negatives mode
+- `soft` — bans soft conclusions (no "likely", "probably", "should work" without proof)
 
-Skills compose. `/max` is literally `/100` + `/zero` + `/soft` combined.
+Skills compose. The rigor-mode skills (`100`, `zero`, `soft`) stay active for the rest of the session once invoked. The `.claude/commands/max.md` command wraps a preset combination for operators who want one-shot activation of the strictest rigor tier.
 
 ---
 
@@ -87,7 +87,7 @@ Key commands:
 | `/blast` | Blast radius analysis (files, types, pipeline stages affected) |
 | `/dead` | Live/dead path verdict for a file or function |
 | `/verify` | 3-leg verification: build + grep facts + tests |
-| `/swarm` | Parallel subagent investigation decomposition |
+| `/zt` | Zero-tolerance violation scan across the project |
 | `/root` | Root-cause matrix for a symptom |
 | `/zt` | Zero-tolerance violation scan |
 

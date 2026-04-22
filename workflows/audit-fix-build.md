@@ -25,9 +25,9 @@ Skip it only for trivial single-line cosmetic changes (typo fixes, import reorde
 **Goal:** determine what is actually wrong. Do not fix anything in this phase.
 
 **Invocation:**
-- `/chen <subsystem or scope>` for adversarial deep audit
-- `/diagnose <error description>` for a focused 4-phase bug investigation
-- Code Reviewer agent for post-diff pass (defensive, pre-commit)
+- chen sub-agent (auto-delegates from "audit this subsystem" / "is this safe to ship") for adversarial deep audit
+- `diagnose` skill (auto-invokes from error / stack-trace / "why is this failing" signals) for a focused 4-phase bug investigation
+- code-reviewer sub-agent (auto-delegates from "review this diff" / PR-review signals) for post-diff pass (defensive, pre-commit)
 
 **Deliverable:** a findings report with:
 - Severity for each finding (P0 / P1 / P2 / P3)
@@ -56,7 +56,7 @@ Skip it only for trivial single-line cosmetic changes (typo fixes, import reorde
 **Invocation:**
 - Work from the Phase 1 report.
 - For each approved finding: read the current code, confirm root cause still holds, implement the smallest fix that closes it.
-- Run `/grep-verify <key claim>` on each claim the fix rests on.
+- Invoke the grep-verifier sub-agent (or the `grep-verify` skill preloaded in it) on each claim the fix rests on.
 - Run the project's typecheck / lint after every edit (enforced by PostToolUse hook if configured in `.claude/settings.json`).
 - If the finding is pattern-level (same bug in multiple places), do a full-file / full-codebase pattern census before claiming complete.
 
@@ -69,7 +69,7 @@ Skip it only for trivial single-line cosmetic changes (typo fixes, import reorde
 
 **Commit per finding** with the project's commit convention (see [commit-conventions.md](commit-conventions.md)). Reference the finding ID or decision code in the commit message.
 
-**Halt gate:** after each fix, optionally re-run `/grep-verify` and the code-reviewer agent. Before moving to Phase 3, verify every approved finding has either been implemented or explicitly deferred.
+**Halt gate:** after each fix, optionally re-invoke the grep-verifier sub-agent and the code-reviewer sub-agent. Before moving to Phase 3, verify every approved finding has either been implemented or explicitly deferred.
 
 ---
 
@@ -78,14 +78,14 @@ Skip it only for trivial single-line cosmetic changes (typo fixes, import reorde
 **Goal:** integrate the fixes, prove the behavior is restored, open a PR.
 
 **Invocation:**
-- `/verify <scope>` — 3-leg verification (typecheck, grep fact-check, test suite)
-- `/adverse <subsystem>` — adversarial completeness check across security / business-logic / integration-wiring dimensions
-- Optionally `/st <domain>` for a full stress test if the change touches a production-readiness surface
-- `/pr` — preflight + PR submission. Delegates to the code-reviewer agent for a final safety pass
+- `/verify <scope>` command — 3-leg verification (typecheck, grep fact-check, test suite)
+- `adverse` skill (auto-invokes from "what am I missing" / "edge cases" signals) — adversarial completeness check across security / business-logic / integration-wiring dimensions
+- Optionally the `st` skill (auto-invokes from "stress test" / "production-ready" signals) for a full stress test if the change touches a production-readiness surface
+- `pr` skill (preloaded in code-reviewer sub-agent; auto-invokes from "open a PR" / "submit this") — preflight + PR submission. Delegates to the code-reviewer sub-agent for a final safety pass
 
 **Deliverable:**
 - All approved findings either implemented or deferred (deferred ones recorded in BACKLOG.md)
-- All tests pass (existing + any new ones from `/project-tdd` if the change used TDD)
+- All tests pass (existing + any new ones from the `/project-tdd` command if the change used TDD)
 - Adversarial completeness scores are honest — low percentages are valuable information
 - PR opened via `gh pr create` with Summary + Test Plan
 - Post-merge: log learnings in LEARNINGS.md if any pattern-level insight emerged
@@ -93,7 +93,7 @@ Skip it only for trivial single-line cosmetic changes (typo fixes, import reorde
 **Rules:**
 - **Execution proof, not wiring proof**: WIRING CONFIRMED ≠ EXECUTION PROVEN. State both separately.
 - **No "probably fixed"**: answer "will this actually work? what could still be broken? what verification proves it works?" explicitly.
-- **Session-end discipline**: run `/session-end` to produce a structured handoff for the next session.
+- **Session-end discipline**: invoke the `session-end` skill (auto-invokes from "wrap up" / "end session" / "write handoff" signals) to produce a structured handoff for the next session.
 
 **Halt gate:** the operator owns PR merge. Never merge to `main` / `master` / `LIVE` / `Production` branches from a Claude Code session.
 
@@ -114,4 +114,4 @@ These are specific ways the loop breaks when an AI session is the one running it
 2. **Pattern-level close-from-one-hit** — finding the bug on line 51, fixing it, moving on without checking lines 89, 147, 203. Run the full-file census.
 3. **Writing code before the success criteria exist** — Karpathy pitfall 8.4. If you can't state how you'll verify the fix works, you're not ready to write the fix.
 4. **Dead-code edits** (LEARNINGS.md §1) — correct fixes to files that don't execute in production. Always grep-verify the import chain before editing.
-5. **"Should work" / "looks correct"** — banned language under `/100`, `/soft`, `/zero`. Hard evidence or honest uncertainty. Nothing in between.
+5. **"Should work" / "looks correct"** — banned language under the `100`, `soft`, `zero` rigor-mode skills (auto-invoke from "no margin for error" / "no guessing" / "no false positives" signals). Hard evidence or honest uncertainty. Nothing in between.

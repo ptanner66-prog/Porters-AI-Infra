@@ -13,7 +13,7 @@ Sessions operate in one of three modes. Declare your mode at the start of a sess
 | Mode | Trigger | Behavior |
 |------|---------|----------|
 | **IMPLEMENT** | Default — active coding task | High-effort editing, verification after every change, GitNexus impact check before every symbol edit |
-| **AUDIT** | `/chen`, `/adverse`, explicit request | Read-only investigation. No edits. Produce findings with evidence labels. Await operator approval before implementing. |
+| **AUDIT** | auto-delegation to chen sub-agent, `adverse` skill auto-invocation, or explicit operator request | Read-only investigation. No edits. Produce findings with evidence labels. Await operator approval before implementing. |
 | **DISCOVERY** | New codebase, onboarding | Inventory mode. Read, map, document. No edits. Produce a structured report. |
 
 **Mode-switching rules:**
@@ -25,7 +25,7 @@ Sessions operate in one of three modes. Declare your mode at the start of a sess
 
 ## Parallel Agent Rules
 
-When spawning subagents (via `/swarm` or manual multi-agent use):
+When spawning subagents (via the architect sub-agent's `swarm` skill, or manual multi-agent use):
 
 1. **Decompose by file boundary** — each agent owns a non-overlapping set of files.
 2. **Read-only subagents** — subagents investigate and report; the main thread synthesizes and edits.

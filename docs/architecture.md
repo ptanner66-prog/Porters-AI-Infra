@@ -43,9 +43,9 @@ The following integration targets are documented here as hook points — not yet
 
 **What it is:** A parallel agent coordination layer where multiple Claude Code agents work concurrently on non-overlapping file sets.
 
-**Current state:** The `/swarm` command implements single-session swarm decomposition (spawn subagents from a main thread). Full multi-process swarm coordination is not implemented.
+**Current state:** The architect sub-agent's preloaded `swarm` skill (with a structured command wrapper at `.claude/commands/swarm.md`) implements single-session swarm decomposition (spawn subagents from a main thread). Full multi-process swarm coordination is not implemented.
 
-**Plug-in point:** Swarm mode would connect at the persona-selection layer in AGENTS.md. A swarm coordinator persona would replace the current single-agent IMPLEMENT mode. The `/swarm` command protocol would become the communication standard between agents.
+**Plug-in point:** Swarm mode would connect at the sub-agent-selection layer in AGENTS.md. A swarm-coordinator sub-agent would replace the current single-agent IMPLEMENT mode. The `swarm` skill's decomposition protocol would become the communication standard between agents.
 
 **What's needed to implement:** A coordination bus (shared state or message queue), a work-claiming protocol to prevent overlap, and a synthesis step for the main thread.
 

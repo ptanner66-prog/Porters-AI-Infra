@@ -11,9 +11,9 @@ PR review in tanner-stack is a layered discipline: the author does a preflight, 
 
 ---
 
-## Layer 1 — Author Preflight (/pr skill)
+## Layer 1 — Author Preflight (`pr` skill)
 
-Before opening the PR, the author runs `/pr` which:
+Before opening the PR, the author invokes the `pr` skill (preloaded in the code-reviewer sub-agent; also auto-invokes from "open a PR" / "submit this" signals), which:
 
 1. **Branch safety**: confirms the current branch is not `main` / `master` / `LIVE` / `Production`. Blocks immediately if it is.
 2. **Code Reviewer delegation**: launches the code-reviewer sub-agent (see [.claude/agents/code-reviewer.md](../.claude/agents/code-reviewer.md)) with the changed-file list. Sub-agent returns CLEAN / WARNINGS / BLOCKED.
@@ -22,7 +22,7 @@ Before opening the PR, the author runs `/pr` which:
 5. **Stage and commit**: explicit file-by-file staging (**never** `git add .`). Commit message per [commit-conventions.md](commit-conventions.md).
 6. **Push + PR**: `git push -u origin HEAD`, then `gh pr create` with Summary + Test Plan body (see below).
 
-If any check fails, `/pr` stops. It does not suggest `--no-verify` or other bypasses.
+If any check fails, the `pr` skill stops. It does not suggest `--no-verify` or other bypasses.
 
 ---
 
@@ -90,7 +90,7 @@ For high-risk changes (pipeline boundaries, scoring logic, routing rules, inviol
 ## Rules (binding)
 
 1. **No force-push.** Configure `.claude/settings.json` to deny `git push --force`. If an override is ever needed, the operator does it outside a Claude Code session.
-2. **No direct commits to protected branches.** Enforced by the `/pr` branch-safety check and ideally by repo branch-protection rules.
+2. **No direct commits to protected branches.** Enforced by the `pr` skill's branch-safety check and ideally by repo branch-protection rules.
 3. **Explicit file staging.** `git add .` / `git add -A` is banned because it accidentally captures unrelated edits. Stage each file by name.
 4. **Commit messages follow the convention** (see [commit-conventions.md](commit-conventions.md)) or the PR is blocked.
 5. **Code Reviewer runs on every PR**, even trivial ones. The few-second cost is insurance against the 38–54% false-positive category of mistakes.
