@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Edit complete. Run your type checker: npx tsc --noEmit (or equivalent)'"
+            "command": "echo 'Edit complete. Run your project type checker (configured per language / toolchain).'"
           }
         ]
       }

@@ -1,11 +1,12 @@
 {
   "version": "0.0.1",
+  "//": "Language- and project-specific values set by first-session derivation (v0.4+) or operator overlay in .claude/settings.local.json. Replace placeholder tokens below with your project's dev-server invocation.",
   "configurations": [
     {
       "name": "dev-server",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "runtimeExecutable": "<PROJECT_DEV_COMMAND>",
+      "runtimeArgs": ["<PROJECT_DEV_ARGS>"],
+      "port": 0
     }
   ]
 }
