@@ -7,10 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: decide
-description: >
-  Surfaces pending decisions that need operator input. Scans progress / status docs,
-  CLAUDE.md, conversation context, git state, and codebase for unresolved choices, blocked
-  work, and tradeoffs. Presents each decision with context and a recommended course of action.
+description: Use PROACTIVELY when user says "what's blocking me", "what needs my input", "where are we stuck", or at session-start after a gap, to surface pending decisions the project is waiting on. Scans progress/status docs, CLAUDE.md, git state, codebase TODOs, uncommitted changes for unresolved choices with tradeoffs and recommendations. Not for deciding between options the user just presented — this surfaces decisions the project has already stalled on.
 disable-model-invocation: true
 context: fork
 allowed-tools: Bash(grep *) Bash(rg *) Bash(cat *) Bash(git *) Read Grep Glob

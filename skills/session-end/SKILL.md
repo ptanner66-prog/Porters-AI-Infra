@@ -7,10 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: session-end
-description: >
-  End-of-session handoff document generator. Captures git state, summarizes all changes
-  made, lists decisions / work items implemented, outstanding work, blockers, and next
-  steps. Formats output as a pasteable handoff for the next session. Manual invocation only.
+description: Use PROACTIVELY at end of a working session — when user says "wrap up", "end session", "write handoff", "close out", or before a long break. Generates structured handoff capturing git state, changes made, decisions reached, outstanding work, blockers, and next steps, formatted as pasteable for the next session. Also invokable as /end (alias).
 disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(grep *) Bash(wc *) Bash(cat *) Bash(find *) Read Grep Glob
 ---

@@ -7,11 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: lossy
-description: >
-  Hunts for design-level lossy transformations in a pipeline — places where data is
-  silently dropped, truncated, downcast, or semantically flattened as it crosses
-  boundaries. Not syntax bugs. Structural data loss that looks intentional but isn't.
-  Use when data is mysteriously degraded between stages.
+description: Use PROACTIVELY when user says "data is mysteriously degraded", "values dropped between stages", "information lost", or is debugging silent data loss across pipeline boundaries. Hunts design-level lossy transformations — silent field drops, truncations, type narrowing, scale mismatches, JSON round-trips that lose keys, compat layers that discard fields. Not syntax bugs — structural loss that compiles and looks intentional.
 disable-model-invocation: true
 context: fork
 argument-hint: "[pipeline area or file to investigate]"

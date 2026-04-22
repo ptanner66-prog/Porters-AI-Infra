@@ -7,13 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: 100
-description: >
-  Enforces 100% certainty standard on all findings and fixes. No findings without
-  file:line proof. No fixes without proven root cause. No "probably fixed." No
-  closing a pattern-level finding from a single instance. Full-file pattern census
-  required. Deep wire trace to 100% certainty. Zero false positives AND zero false
-  negatives. Use when the stakes are high and hand-waving is unacceptable.
-  Stays active for the rest of the session.
+description: Use PROACTIVELY when stakes are high and hand-waving is unacceptable — before shipping critical fixes, before merging to production paths, or when the user says "I need this right", "no margin for error", or "prove it". Enforces 100% certainty; file:line proof on every finding, proven root cause on every fix, full-file pattern census, deep wire trace, explicit CONFIRMED/HYPOTHESIS/UNVERIFIED labels. Stays active for the rest of the session. Strictest rigor tier — tighter than /zero (proof but not full census) and /soft (only bans soft conclusions).
 user-invocable: true
 disable-model-invocation: true
 ---

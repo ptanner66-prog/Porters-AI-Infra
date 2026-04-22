@@ -7,13 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: diagnose
-description: >
-  Structured diagnostic workflow for bugs and errors. Runs a 4-phase investigation:
-  LOCATE (find the actual live code path, not a dead-code twin), CONTEXT (identify
-  which pipeline stage and which project-specific decisions apply), ROOT CAUSE
-  (distinguish bug from symptom, rule out upstream data issues), and FIX PROPOSAL
-  (exact file:line with downstream impact and verification strategy). Enforces
-  grep-verification and dead-code-trap avoidance.
+description: Use PROACTIVELY when user reports an error, stack trace, unexpected behavior, test failure, or "why isn't this working". Runs a 4-phase investigation — LOCATE (live code not dead-code twin), CONTEXT (pipeline stage and affected decisions), ROOT CAUSE (bug vs. symptom vs. upstream data issue), FIX PROPOSAL (exact file:line with downstream impact, risk classification, verification command). Distinct from chen sub-agent (latent-defect audit without an active bug) and /code (execution verification without an active bug report).
 disable-model-invocation: true
 context: fork
 argument-hint: "[error-description]"

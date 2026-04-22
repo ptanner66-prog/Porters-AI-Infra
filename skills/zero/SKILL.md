@@ -7,11 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: zero
-description: >
-  Enforces Zero False Positive / Zero False Negative standard on all findings and fixes.
-  Every finding must be proven real (no FP). Every possible finding must be hunted for (no FN).
-  Full-file pattern census on every defect. Deep wire trace to full file scope, not just
-  execution paths. Stays active for rest of session.
+description: Use PROACTIVELY when user says "no false positives", "don't miss any", "find all of them", or when missed findings are as costly as false alarms (pre-launch audits, security reviews). Enforces Zero False Positive AND Zero False Negative — every finding proven real, every possible finding actively hunted, full-file pattern census on every defect. Lighter than /100 (which also requires deep wire trace to execution proof) but stricter than /soft. Stays active for rest of session.
 user-invocable: true
 disable-model-invocation: true
 ---

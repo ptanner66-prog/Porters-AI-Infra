@@ -7,11 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: code
-description: >
-  Confirms with 100% certainty that code is actually connected and executing. Reviews
-  every line of deep source code. Not import tracing — execution tracing. Verifies the
-  wire is live, the function runs, the write lands, the consumer reads it. Full file
-  inventory, wire traces, every line of code in each file in scope.
+description: Use PROACTIVELY when user says "is this actually executing", "confirm the wire", "full file review", or needs proof that code runs end-to-end. Deep source-code verification — file inventory, line-by-line reading, wire trace across every boundary, explicit WIRING CONFIRMED vs EXECUTION PROVEN split. Distinct from chen sub-agent (defect audit) and grep-verifier sub-agent (textual claim check).
 disable-model-invocation: true
 context: fork
 argument-hint: "[file, function, or subsystem to verify]"

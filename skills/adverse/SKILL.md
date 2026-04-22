@@ -7,11 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: adverse
-description: >
-  Adversarial completeness check. Scores the audited area on security surface coverage,
-  business logic coverage, and integration wiring coverage. Not just import tracing —
-  confirms actual execution, actual data flow, actual failure handling. Identifies what
-  was verified, what was inferred, and what could still hide a false negative.
+description: Use PROACTIVELY when user asks "what am I missing", "edge cases", "what could go wrong", or after any plan/draft/audit is complete. Runs adversarial-completeness pass scoring security surface, business logic, and integration wiring coverage with explicit "what could still hide a false negative" analysis. Do not use for routine code review (that is the code-reviewer sub-agent) or for active bug investigation (use /diagnose).
 disable-model-invocation: true
 context: fork
 argument-hint: "[subsystem or area to check]"

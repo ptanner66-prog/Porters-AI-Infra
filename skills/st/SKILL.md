@@ -8,11 +8,7 @@ Extraction note: per operator decision, framework-only extraction. Project-speci
 
 ---
 name: st
-description: >
-  Full stress test protocol. 5 steps: establish domain boundary and invariants, map
-  upstream/downstream contracts, stress test from 9 viewpoints (functional, data integrity,
-  concurrency, reliability, performance, security, compliance, observability, human factors),
-  upstream/downstream conflict hunt, and pre-mortem. Comprehensive production-readiness audit.
+description: Use PROACTIVELY when user says "stress test this", "is this production-ready", "what happens at scale", or "break it before prod". Runs a 5-step protocol — domain boundary + invariants, upstream/downstream contracts, 9-viewpoint stress (functional, data integrity, concurrency, reliability, performance, security, compliance, observability, human factors), conflict hunt, pre-mortem. Distinct from /adverse (completeness audit) and chen MODE 4 sub-agent (revenue/trust path failure analysis).
 disable-model-invocation: true
 context: fork
 argument-hint: "[subsystem or domain to stress test]"

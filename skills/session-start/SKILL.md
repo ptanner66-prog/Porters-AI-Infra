@@ -7,10 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: session-start
-description: >
-  Session startup briefing. Displays current git state, branch safety check, dev-server
-  status (if applicable), and recent commit history. Use at the beginning of every
-  Claude Code session. Manual invocation only — never auto-trigger.
+description: Use PROACTIVELY at the start of a new working session — when user says "brief me", "what's the state", "where were we", or starts a chat after a gap. Displays git state, branch safety check, dev-server status (if applicable), and recent commit history. Also invokable as /start (alias).
 disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(curl *) Read
 ---

@@ -7,11 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: soft
-description: >
-  Enforces hard-evidence-only debugging. No soft conclusions, no "likely" guesses,
-  no "probably prompt-related" unless you can show the exact instruction, exact runtime
-  file, exact payload before and after, and exact fix. Use when Claude is hand-waving
-  instead of proving. Stays active for the rest of the session.
+description: Use PROACTIVELY when user says "no guessing", "hard evidence only", "prove it with the source", or Claude has been hand-waving instead of proving. Bans soft conclusions — no "likely", "probably", "should work", "might be" without exact file / line / runtime value / fix shown. Less strict than /100 (which also requires full-file pattern census and deep wire trace). Stays active for the rest of the session.
 user-invocable: true
 disable-model-invocation: true
 ---

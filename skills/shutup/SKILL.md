@@ -7,10 +7,7 @@ Operator: Porter Tanner
 
 ---
 name: shutup
-description: >
-  Silences Claude for the rest of the session. Claude will not speak, respond, or take
-  action until explicitly told to resume. Use when you need to preserve context window
-  and don't want Claude consuming tokens with responses.
+description: Use when user explicitly says "stop talking", "shut up", "quiet", or wants to preserve context-window tokens without model output. Silences Claude for the rest of the session — no speech, no response, no action until explicitly told to resume. Context-preservation tool for long sessions where intermediate narration is costing tokens.
 disable-model-invocation: true
 ---
 
