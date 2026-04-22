@@ -128,3 +128,29 @@ Re-verified after the v0.3.1 description-sharpening pass (commits `f011743`, `59
 - AUTO (16): `100`, `adverse`, `code`, `decide`, `diagnose`, `gitnexus-cli`, `gitnexus-debugging`, `gitnexus-exploring`, `gitnexus-guide`, `lossy`, `session-end`, `session-start`, `shutup`, `soft`, `st`, `zero` — all have "Use PROACTIVELY" / "Use when" openers with explicit trigger phrases. `gitnexus-debugging` and `gitnexus-exploring` now tool-availability-gated; `swarm` now marked architect-invoked-only.
 - SCAFFOLD (1): `_template`.
 - **Orphans: 0.** Total: 25 directories, all accounted for.
+
+---
+
+## v0.3.1 Category B additions (2026-04-22)
+
+Three new main-session skills added to close dry-run trace gaps #5, #10, #15 from [adversarial-cleanup-2026-04-22.md](adversarial-cleanup-2026-04-22.md):
+
+| Skill | Status | Commit | Purpose |
+|---|---|---|---|
+| `triage` | Added v0.3.1 | `b99c908` | Structured option comparison when user asks "help me decide between A and B" (Trace #5 fix). |
+| `finish` | Added v0.3.1 | `1669424` | Commit-and-close-out discipline when user signals "commit and finish", "ship it", etc. (Trace #10 fix). |
+| `summarize` | Added v0.3.1 | `a4c4dff` | Document compression when user says "summarize", "tldr", "compress this" (Trace #15 fix). |
+
+**Updated totals:**
+- Category A (sub-agent-owned, preloaded): **8** (unchanged)
+- Category B (main-session auto-invoke): **19** (was 16 + 3)
+- Scaffold: **1** (unchanged)
+- **Total `skills/` directories: 28** (was 25 + 3)
+
+Each new skill's description includes explicit `DO NOT USE for X — that is the Y skill` carve-outs to prevent auto-routing overlap with the sibling skill it was confused with in the original trace:
+
+- `triage` carves out from `decide` (pending project decisions vs. user-presented option triage).
+- `finish` carves out from `pr` (main-session commit vs. code-reviewer-sub-agent PR submission).
+- `summarize` carves out from `lossy` (document compression vs. pipeline data-loss debugging) and from `shutup` (summary with preservation vs. silencing).
+
+**Coverage guarantee (post-v0.3.1):** every directory in `skills/` remains either (a) preloaded in a sub-agent's `skills:` frontmatter OR (b) has `Use PROACTIVELY` / `MUST BE USED` / `Use when` in its description. Zero orphans.
